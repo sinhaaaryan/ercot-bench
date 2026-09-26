@@ -214,6 +214,33 @@ def sft_build(
     typer.echo(summary)
 
 
+@app.command()
+def ask(
+    question: Optional[str] = typer.Argument(None, help="Ask once and exit (otherwise interactive REPL)"),
+    targets: str = typer.Option("sft,base,haiku", help="Comma-separated: sft, base, haiku, sonnet"),
+    example: Optional[int] = typer.Option(None, help="Run curated example N from configs/demo_examples.json and exit"),
+    sft_url: str = typer.Option("http://localhost:8000/v1", help="vLLM URL serving the SFT model"),
+    base_url: str = typer.Option("http://localhost:8001/v1", help="vLLM URL serving base Qwen3-1.7B"),
+    sft_model: Optional[str] = typer.Option(None, help="Model id served at --sft-url (default: the SFT weights path)"),
+):
+    """Demo: ask models an ERCOT question side by side; runs their SQL and grades it when ground truth exists."""
+    from rich.console import Console
+
+    from ercot_bench import demo
+
+    console = Console()
+    tmap = demo.default_targets(sft_url, base_url, sft_model or demo.SFT_WEIGHTS)
+    chosen = [tmap[t.strip()] for t in targets.split(",") if t.strip()]
+    if example is not None:
+        ex = demo.load_examples()["examples"][example - 1]
+        task = demo.all_test_tasks(load_config())[ex["task_id"]]
+        demo.ask_once(task.question, task, chosen, console)
+    elif question:
+        demo.ask_once(question, None, chosen, console)
+    else:
+        demo.repl(chosen, console)
+
+
 @app.command("rl-subset")
 def rl_subset(
     results: list[Path] = typer.Argument(..., help="Result JSONL(s) of the SFT (or base) model on the train split"),

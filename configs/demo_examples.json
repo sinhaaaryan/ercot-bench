@@ -1,0 +1,22 @@
+{
+  "_comment": "Curated demo questions. 'task_id' entries have code-computed ground truth (graded); 'question' entries are free-form (SQL is run, not graded). Notes reflect recorded eval results (pass rate over 3-4 samples).",
+  "examples": [
+    {"task_id": "rt_avg_cents_kwh_month-093eba0d40", "title": "Residential framing: wholesale price in cents/kWh", "note": "SFT 100%, base 0%"},
+    {"task_id": "dst_repeated_hour_da-01ae5698bb", "title": "DST gotcha: the repeated hour on fall-back day", "note": "SFT 100%, base 0%"},
+    {"task_id": "battery_fixed_da_revenue-09610b38fd", "title": "Battery schedule revenue (HELD-OUT template)", "note": "never seen in training: SFT 100%, base 0%"},
+    {"task_id": "wind_avg_negative_rt-0757e3ceed", "title": "Wind output during negative prices (cross-table join)", "note": "SFT 100%, base 0%"},
+    {"task_id": "longest_run_above-15d793f749", "title": "Longest consecutive price spike (window functions)", "note": "SFT 100%, base 0%"},
+    {"task_id": "block_avg_da_month-0498e81dbe", "title": "5x16 on-peak block with NERC holidays", "note": "SFT 100%, base 0%"},
+    {"task_id": "peak_rt_utc-0cb068b8b2", "title": "Peak interval in UTC (HELD-OUT template)", "note": "SFT 100%, base 0%"},
+    {"task_id": "load_weighted_rt_month-0757e3ceed", "title": "Load-weighted average price (15-min to hourly)", "note": "SFT 100%, base 0%"},
+    {"task_id": "peak_netload_hour_rt-0a7cf7499e", "title": "Price at the peak net-load hour (HELD-OUT, honest gap)", "note": "SFT 0%, Sonnet 100%: what RL should fix"},
+    {"task_id": "battery_2h_optimal_da-065016080d", "title": "Optimal 2-hour battery dispatch (hardest)", "note": "every model incl. Sonnet 0%: headroom"}
+  ],
+  "freeform": [
+    "What was the highest 15-minute real-time price at HB_HOUSTON during January 2024, in $/MWh?",
+    "On 2024-08-20, what was the average day-ahead price at HB_WEST, in $/MWh rounded to 2 decimals?",
+    "Which trading hub had the most 15-minute real-time intervals with negative prices in April 2025? Answer with the settlement point name.",
+    "What share of ERCOT generation came from solar in June 2025, as a percentage rounded to 1 decimal?",
+    "What would a 10 MW battery have earned on 2025-08-20 at HB_NORTH by charging during HE11-HE14 and discharging during HE19-HE22 at day-ahead prices, assuming 90% efficiency on discharge? Answer in dollars rounded to 2 decimals."
+  ]
+}
