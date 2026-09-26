@@ -1,0 +1,47 @@
+# prime-rl SFT (distillation) on ERCOT-Bench frontier-model solutions.
+#   ercot-bench sft-build results/train__claude-cli__sonnet.jsonl   # -> data/sft/train.jsonl
+#   cd <prime-rl checkout> && uv run sft @ /path/to/ercot-bench/configs/prime-rl/sft.toml --run.name ercot-sft
+# Paths below are relative to the prime-rl checkout; override with --data.name / --model.name.
+max_steps = 300
+
+[ckpt] # checkpoint at the end of training (outputs/ercot-sft/checkpoints/step_300)
+
+[model]
+name = "Qwen/Qwen3-8B"          # configurable; e.g. Qwen/Qwen3-4B for a cheaper run
+
+[model.lora]
+rank = 32
+alpha = 64.0
+
+[renderer]
+name = "qwen3"
+enable_thinking = false
+
+[data]
+name = "../ercot-bench/data/sft"   # directory containing train.jsonl with a `messages` column
+seq_len = 4096
+batch_size = 32
+
+[optim]
+lr = 1e-4                          # LoRA LR; use ~1e-5 for full fine-tuning
+
+[eval]
+interval = 50
+num_examples = 64
+
+[eval.sampling]
+max_completion_tokens = 1024
+
+[[eval.source]]
+name = "ercot-sql-test-in-template"
+env.taskset.id = "ercot-sql"
+env.taskset.split = "test_in_template"
+env.taskset.subset_size = 64
+env.agent.harness.id = "null"
+env.agent.runtime.type = "subprocess"
+
+[inference]
+
+[deployment]
+num_train_gpus = 1
+num_infer_gpus = 1
