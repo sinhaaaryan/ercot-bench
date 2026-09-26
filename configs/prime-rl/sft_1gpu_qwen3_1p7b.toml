@@ -1,0 +1,23 @@
+# Single-GPU (e.g. one RTX 5090 32GB) full fine-tune SFT of Qwen3-1.7B on ERCOT-Bench distillation data.
+# Full fine-tune (not LoRA) so tools/convert_dcp_to_bf16.py can export a vLLM-servable checkpoint.
+# No [eval]/[inference]: online eval needs a second GPU; evaluate the exported checkpoint with ercot-bench instead.
+#   cd prime-rl && uv run sft @ ../ercot-bench/configs/prime-rl/sft_1gpu_qwen3_1p7b.toml --run.name ercot-sft-1p7b
+max_steps = 80
+
+[ckpt]
+
+[model]
+name = "Qwen/Qwen3-1.7B"
+
+[renderer]
+name = "qwen3"
+enable_thinking = false
+
+[data]
+name = "../ercot-bench/data/sft"
+seq_len = 4096
+batch_size = 32
+micro_batch_size = 4
+
+[optim]
+lr = 1e-5

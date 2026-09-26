@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import os
 import threading
 from pathlib import Path
 
@@ -91,7 +92,13 @@ def _base_connection(db_path: Path) -> duckdb.DuckDBPyConnection:
     with _LOCK:
         con = _BASE.get(key)
         if con is None:
-            con = duckdb.connect(key, read_only=True, config={"enable_external_access": False})
+            # Cap DuckDB per process: its default is 80% of host RAM, and every env worker / eval process opens
+            # its own connection. Override with ERCOT_DUCKDB_MEMORY_LIMIT / ERCOT_DUCKDB_THREADS.
+            con = duckdb.connect(key, read_only=True, config={
+                "enable_external_access": False,
+                "memory_limit": os.getenv("ERCOT_DUCKDB_MEMORY_LIMIT", "1GB"),
+                "threads": int(os.getenv("ERCOT_DUCKDB_THREADS", "2")),
+            })
             _BASE[key] = con
         return con
 

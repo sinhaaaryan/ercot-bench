@@ -58,11 +58,14 @@ Known data notes:
 
 ## Tasks (Phase 2)
 
-36 templates in 7 families (`src/ercot_bench/tasks/templates/`), difficulty 1-3:
+44 templates in 8 families (`src/ercot_bench/tasks/templates/`), difficulty 1-3:
 basic aggregates, time conventions (HE vs start, UTC vs local, DST repeated/missing hours, 15-min vs hourly,
 cents/kWh), spreads (DA-RT, hub/LZ basis, zone ranking), conditional joins (net load, load thresholds,
 wind during negative prices, gas at the peak), events (threshold counts, longest run, peak timestamp,
-day lists), forecast error, and battery arithmetic (fixed DA/RT schedules, best single cycle, monthly revenue).
+day lists), forecast error, battery arithmetic (fixed DA/RT schedules, best single cycle, monthly revenue), and
+`advanced` (added after Sonnet saturated the first 36): 5x16/2x16/7x8 blocks with NERC holidays, an
+SOC-constrained 1 MW / 2 MWh battery optimum (DP reference), load-weighted prices, spike-event counting,
+peak-net-load-hour prices, RT>DA hour share, year-over-year change, and the fall-back day's off-peak hours.
 
 Each template samples only values that exist in the data, states the answer format explicitly, and computes
 ground truth with its own SQL. Degenerate samples (ties, empty sets, zero counts) are rejected.
@@ -137,13 +140,20 @@ tasksets + harnesses, and current prime-rl consumes v1 tasksets, so we use v1. S
 `null` harness. The reward calls `ercot_bench.env.score.score` directly (no reimplementation).
 
 ```bash
-cd environments/ercot_sql && uv sync
-OPENAI_API_KEY=x uv run eval ercot-sql --env.agent.harness.id null --env.agent.runtime.type subprocess \
-  --env.taskset.split test_in_template --env.taskset.subset-size 8 -n 8 -r 1 \
-  --model mlx-community/Qwen3-4B-4bit --client.base-url http://localhost:8089/v1 --client.api-key-var OPENAI_API_KEY \
-  --sampling.max-tokens 2048 --no-rich
-uv run python ../../scripts/compare_verifiers_rewards.py outputs/   # verifiers reward == our harness reward
+# inside the prime-rl venv (its bundled verifiers is newer than PyPI 0.3.1; flag names below match it)
+cd prime-rl && uv pip install --no-deps -e ../ercot-bench -e ../ercot-bench/environments/ercot_sql
+uv pip install duckdb sqlglot python-dotenv typer tzdata
+VLLM_KEY=x uv run eval ercot-sql --env.agent.harness.id null --env.agent.runtime.type subprocess \
+  --env.taskset.split test_in_template --env.taskset.subset-size 32 -n 32 -r 2 \
+  --model Qwen/Qwen3-8B --client.base-url http://localhost:8000/v1 --client.api-key-var VLLM_KEY \
+  --sampling.max-completion-tokens 2048 --sampling.extra-body '{"chat_template_kwargs": {"enable_thinking": false}}' \
+  --output-dir ../ercot-bench/outputs
+uv run python ../ercot-bench/scripts/compare_verifiers_rewards.py ../ercot-bench/outputs/   # verifiers == harness
 ```
+
+Verified on an RTX 5090: 64 single-turn rollouts, 0 errors, and all 64 traced rewards equal our harness's
+`score()` on the same replies. `environments/ercot_sql/tests/test_rewards_match.py` replays every recorded
+harness completion through the taskset's `@vf.reward` as well.
 
 Env args: `--env.taskset.split` (split name or JSONL path), `--env.taskset.subset-size`,
 `--env.taskset.db-path`, `--env.taskset.task.db-path`, `--env.taskset.task.query-timeout-s`.
@@ -151,27 +161,94 @@ Env args: `--env.taskset.split` (split name or JSONL path), `--env.taskset.subse
 ## SFT (Phase 5) and RL (Phase 6) with prime-rl
 
 prime-rl has a native `uv run sft` entrypoint (a HF/local dataset with a `messages` column), so SFT and RL share
-one stack. Configs in `configs/prime-rl/` validate against the current `prime-rl-configs` schema.
+one stack. All configs in `configs/prime-rl/` validate against the installed prime-rl config schema.
+
+| config | purpose |
+|---|---|
+| `sft_1gpu_qwen3_1p7b.toml` | **tested**: full fine-tune of Qwen3-1.7B on one 32 GB GPU (exportable to HF) |
+| `rl_lora_1gpu.toml` | **tested**: memory-safe single-GPU LoRA RL from the SFT checkpoint, external vLLM on the same GPU |
+| `rl_smoke_1gpu.toml` | single-GPU full-FT smoke config (needs more host RAM than 40 GB for 1.7B; see safeguards) |
+| `sft.toml`, `rl.toml`, `rl_smoke.toml` | multi-GPU defaults (Qwen3-8B + LoRA; 1 inference + 1+ trainer GPU) |
+
+### Tested single-GPU workflow (RTX 5090 32 GB, 40 GB RAM, WSL2)
 
 ```bash
+# prime-rl checkout next to this repo (submodules over HTTPS if you have no GitHub SSH key)
+git clone https://github.com/PrimeIntellect-ai/prime-rl.git && cd prime-rl
+git -c url."https://github.com/".insteadOf="git@github.com:" submodule update --init --recursive
+uv sync --all-extras
+uv pip install --no-deps -e ../ercot-bench -e ../ercot-bench/environments/ercot_sql
+uv pip install duckdb sqlglot python-dotenv typer tzdata
+export VLLM_USE_V2_MODEL_RUNNER=0     # WSL2: vLLM's V2 model runner needs UVA/pinned memory, unavailable there
+../ercot-bench/scripts/mem_guard.sh & # watchdog: pauses ercot-* jobs before RAM/VRAM run out (see below)
+
 # 1. frontier solutions on train -> SFT data (correct only, deduped by SQL, capped per task)
-uv run ercot-bench eval --backend claude-cli --model sonnet --split train --k 4
+cd ../ercot-bench
+uv run ercot-bench eval --backend claude-cli --model sonnet --split train --limit 450 --k 2
 uv run ercot-bench sft-build results/train__claude-cli__sonnet.jsonl        # -> data/sft/train.jsonl
 
-# 2. on a GPU box (CUDA required): prime-rl checkout next to this repo
-curl -sSL https://raw.githubusercontent.com/PrimeIntellect-ai/prime-rl/main/scripts/install.sh | bash
-cd prime-rl && uv pip install -e ../ercot-bench -e ../ercot-bench/environments/ercot_sql
-uv run sft @ ../ercot-bench/configs/prime-rl/sft.toml --run.name ercot-sft
+# 2. SFT (~18 min on a 5090), then export DCP -> HF safetensors
+cd ../prime-rl
+../ercot-bench/scripts/guarded_run.sh sft 34G uv run sft @ ../ercot-bench/configs/prime-rl/sft_1gpu_qwen3_1p7b.toml \
+  --data.name ../ercot-bench/data/sft --run.name ercot-sft-1p7b
+uv run python tools/convert_dcp_to_bf16.py outputs/ercot-sft-1p7b/checkpoints/step_80   # -> .../weights
+W=outputs/ercot-sft-1p7b/checkpoints/step_80/weights
 
-# 3. evaluate the SFT checkpoint with our harness (serve with prime-rl's vLLM wrapper)
-uv run inference --vllm.model outputs/ercot-sft/<hf-export> --server.port 8000
-uv run ercot-bench eval --backend openai-compat --model <name> --base-url http://<gpu-host>:8000/v1 --split train --k 8 --use-n
-uv run ercot-bench rl-subset results/train__openai-compat__<name>.jsonl     # -> data/tasks/rl_train.jsonl
+# 3. evaluate the SFT model with our harness, build the RL prompt set
+../ercot-bench/scripts/guarded_run.sh infer 10G uv run inference --vllm.model $W --vllm.gpu-memory-utilization 0.85
+cd ../ercot-bench
+uv run ercot-bench eval --backend openai-compat --model $W --base-url http://localhost:8000/v1 --split test_in_template \
+  --limit 70 --k 4 --use-n --no-thinking --out results/test_in_template__openai-compat__qwen3-1.7b-sft.jsonl
+uv run ercot-bench eval ... --split train --limit 450 --out results/train__openai-compat__qwen3-1.7b-sft.jsonl
+uv run ercot-bench rl-subset results/train__openai-compat__qwen3-1.7b-sft.jsonl     # -> data/tasks/rl_train.jsonl
+systemctl --user stop ercot-infer.scope
 
-# 4. RL: smoke test first, then the real run
-uv run rl @ ../ercot-bench/configs/prime-rl/rl_smoke.toml --run.name ercot-smoke   # expect non-constant reward
-uv run rl @ ../ercot-bench/configs/prime-rl/rl.toml --model.name <sft checkpoint> --run.name ercot-rl
+# 4. RL (LoRA) with vLLM co-located on the same GPU at 35% memory
+cd ../prime-rl
+../ercot-bench/scripts/guarded_run.sh infer 10G uv run inference --vllm.model $W --vllm.gpu-memory-utilization 0.35 \
+  --vllm.max-model-len 8192 --vllm.enable-lora --vllm.max-lora-rank 16 &
+../ercot-bench/scripts/guarded_run.sh rl 20G uv run rl @ ../ercot-bench/configs/prime-rl/rl_lora_1gpu.toml \
+  --model.name $W --run.name ercot-rl-lora
 ```
+
+### Memory safeguards (why they exist)
+
+A first single-GPU RL attempt (full fine-tune of the 1.7B SFT model) exhausted the 40 GB of host RAM during the
+first trainer step and took down the whole WSL VM. Cause: prime-rl keeps the optimizer state in host RAM by default
+(`trainer.model.optim_cpu_offload = true`), ~20-27 GB of Adam state for a 1.7B full fine-tune, on top of vLLM, the
+orchestrator, env workers, and DuckDB (whose default memory limit is 80% of RAM per process), with no swap.
+Now:
+
+- `scripts/guarded_run.sh <name> <cap> <cmd>` runs each job in its own `systemd --user` scope (`ercot-<name>.scope`)
+  with `MemoryMax=<cap>`, `MemoryHigh=90%`, `MemorySwapMax=0`: an OOM kills only that job, never the VM.
+- `scripts/mem_guard.sh` (watchdog, log `/hackathon/mem_guard.log`): **pauses** (cgroup freeze) all `ercot-*` scopes
+  when host MemAvailable < 6 GB or GPU memory > 31.8 GB, resumes them above 9 GB, and stops the largest scope if
+  MemAvailable < 2.5 GB. Thresholds are env vars. Pause/resume manually with `systemctl --user freeze|thaw`.
+- DuckDB is capped per process (`ERCOT_DUCKDB_MEMORY_LIMIT`, default 1 GB; `ERCOT_DUCKDB_THREADS`, default 2).
+- RL uses LoRA with the optimizer on the GPU (`rl_lora_1gpu.toml`). In the verified run host RAM never dropped below
+  27 GB available and VRAM peaked at 21.8 / 32 GB (vLLM 35% + trainer).
+
+## Results (prototype, RTX 5090 + Claude Code CLI)
+
+Same stratified test subsets for every model (test_in_template: 70 tasks, 2/template; held-out templates: 27 tasks,
+3/template); pass@1 = mean accuracy over k samples (k=3 Sonnet/Qwen3-8B, k=4 Qwen3-1.7B). Open models run
+with thinking disabled.
+
+| model | test_in_template | test_heldout_templates |
+|---|---|---|
+| Claude Sonnet (claude-cli) | 98.1% | 87.7% |
+| Qwen3-8B base | 52.9% | 37.0% |
+| Qwen3-1.7B base | 16.8% | 13.9% |
+| **Qwen3-1.7B + SFT on 802 Sonnet solutions** | **83.2%** | **53.7%** |
+
+- SFT: 80 steps, loss 1.15 -> 0.038, ~18 min. The SFT'd 1.7B beats the base 8B on both splits; the remaining gap
+  to Sonnet is largest on held-out templates (advanced/battery families), i.e. generalization, not format.
+- RL smoke (LoRA GRPO, 15 steps, batch 16 x group 8 from the SFT checkpoint): per-step mean reward 0.38-0.88,
+  non-constant, 0 errors -- the environment and reward plumbing work inside prime-rl.
+- verifiers `eval` on `ercot-sql` vs our harness: 64/64 rewards identical.
+- **Flag (per spec):** Sonnet is above the ~85% threshold on both test splits, even after adding the `advanced`
+  family (Sonnet 90% there). The templates are still too easy to measure frontier progress; they are hard enough to
+  show a large small-model gain. Making templates harder is the top next step.
 
 ## Layout
 
@@ -179,7 +256,7 @@ uv run rl @ ../ercot-bench/configs/prime-rl/rl.toml --model.name <sft checkpoint
 src/ercot_bench/  ingest/ db.py schema_doc.py quality.py tasks/ env/ models/ eval/ sft/ cli.py
 environments/ercot_sql/   verifiers v1 taskset package
 configs/                  ercot_bench.toml, prime-rl/{sft,rl,rl_smoke}.toml
-scripts/                  gridstatus probes, verifiers-vs-harness reward comparison
+scripts/                  gridstatus probes, reward comparison, guarded_run.sh + mem_guard.sh safeguards
 tests/                    pytest (time/DST, execution safety, scoring, generator determinism, report)
 data/, results/           gitignored
 ```

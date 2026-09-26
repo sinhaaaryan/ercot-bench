@@ -16,10 +16,10 @@ def ctx(db_path):
 
 
 def test_template_count_and_families():
-    assert 20 <= len(ALL_TEMPLATES) <= 40
+    assert 20 <= len(ALL_TEMPLATES) <= 50
     fams = {t.family for t in ALL_TEMPLATES}
     assert fams == {"basic_aggregates", "time_conventions", "spreads", "conditional", "events", "forecast_error",
-                    "battery"}
+                    "battery", "advanced"}
     assert {t.difficulty for t in ALL_TEMPLATES} == {1, 2, 3}
 
 
@@ -57,3 +57,23 @@ def test_splits_deterministic_and_disjoint(cfg):
     a = heldout_template_ids(ids, 1234, 0.2)
     assert a == heldout_template_ids(list(reversed(ids)), 1234, 0.2)
     assert 0.15 <= len(a) / len(ids) <= 0.25
+
+
+def test_nerc_holidays_and_blocks():
+    import datetime as dt
+    from ercot_bench.tasks.templates.advanced import block_of, nerc_holidays
+    h = nerc_holidays(2023)
+    assert dt.date(2023, 1, 2) in h        # Jan 1 2023 is a Sunday -> observed Monday
+    assert dt.date(2023, 11, 23) in h      # Thanksgiving
+    assert dt.date(2023, 5, 29) in h       # Memorial Day
+    assert block_of(dt.date(2023, 7, 4), 12) == "2x16"
+    assert block_of(dt.date(2023, 7, 5), 12) == "5x16"
+    assert block_of(dt.date(2023, 7, 5), 23) == "7x8"
+
+
+def test_best_2h_battery_dp():
+    from ercot_bench.tasks.templates.advanced import best_2h_battery
+    assert best_2h_battery([10, 20, 30], 1.0) == 20.0          # charge @10, discharge @30
+    assert best_2h_battery([10, 10, 50, 50], 1.0) == 80.0      # fill 2 MWh, sell 2 MWh
+    assert best_2h_battery([50, 10], 1.0) == 0.0               # no profitable order
+    assert abs(best_2h_battery([0, 100], 0.9) - 90.0) < 1e-9
