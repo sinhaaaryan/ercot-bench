@@ -1,0 +1,33 @@
+# Single-GPU (RTX 5090 32 GB, 40 GB host RAM) LoRA SFT of Qwen3-8B on ERCOT-Bench distillation data.
+# LoRA keeps the frozen bf16 base on GPU (~16.4 GB) and the optimizer state tiny, with no CPU offload, so host RAM
+# stays low (the default optimizer CPU offload is what OOM'd the VM in a full-FT RL attempt).
+# Export with scripts/export_lora_merged.py (prime-rl's convert_dcp_to_bf16.py rejects LoRA checkpoints).
+#   ../ercot-bench/scripts/guarded_run.sh sft8b 28G uv run sft @ ../ercot-bench/configs/prime-rl/sft_1gpu_qwen3_8b_lora.toml \
+#     --data.name ../ercot-bench/data/sft --run.name ercot-sft-8b-lora
+max_steps = 40   # ~3.2 epochs: 32 packed 4096-token samples ~= 64 examples per step, 802 examples
+
+[ckpt]
+
+[model]
+name = "Qwen/Qwen3-8B"
+optim_cpu_offload = false
+# default float32 params would put the 8B base at ~33 GB (OOM at model load); bf16 = ~16.4 GB
+optimization_dtype = "bfloat16"
+reduce_dtype = "bfloat16"
+
+[model.lora]
+rank = 32
+alpha = 64.0
+
+[renderer]
+name = "qwen3"
+enable_thinking = false
+
+[data]
+name = "../ercot-bench/data/sft"
+seq_len = 4096
+batch_size = 32
+micro_batch_size = 4
+
+[optim]
+lr = 1e-4

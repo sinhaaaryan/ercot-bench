@@ -30,6 +30,7 @@ from ercot_bench.tasks.generator import load_tasks
 from ercot_bench.tasks.schema import Task
 
 SFT_WEIGHTS = "/hackathon/outputs/ercot-sft-1p7b/checkpoints/step_80/weights"
+SFT8B_WEIGHTS = "/hackathon/outputs/ercot-sft-8b-lora/export/merged"
 
 
 @dataclass
@@ -40,11 +41,13 @@ class Target:
     kwargs: dict
 
 
-def default_targets(sft_url: str, base_url: str, sft_model: str) -> dict[str, Target]:
+def default_targets(sft_url: str, base_url: str, sft_model: str, sft8b_url: str = "http://localhost:8002/v1",
+                    sft8b_model: str = SFT8B_WEIGHTS) -> dict[str, Target]:
     qwen = {"temperature": 0.0, "max_tokens": 1536, "extra_body": {"chat_template_kwargs": {"enable_thinking": False}}}
     return {
         "sft": Target("Qwen3-1.7B + SFT", "openai-compat", sft_model, {"base_url": sft_url, **qwen}),
         "base": Target("Qwen3-1.7B (base)", "openai-compat", "Qwen/Qwen3-1.7B", {"base_url": base_url, **qwen}),
+        "sft8b": Target("Qwen3-8B + SFT", "openai-compat", sft8b_model, {"base_url": sft8b_url, **qwen}),
         "haiku": Target("Claude Haiku 4.5", "claude-cli", "haiku", {}),
         "sonnet": Target("Claude Sonnet", "claude-cli", "sonnet", {}),
     }

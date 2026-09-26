@@ -217,11 +217,13 @@ def sft_build(
 @app.command()
 def ask(
     question: Optional[str] = typer.Argument(None, help="Ask once and exit (otherwise interactive REPL)"),
-    targets: str = typer.Option("sft,base,haiku", help="Comma-separated: sft, base, haiku, sonnet"),
+    targets: str = typer.Option("sft,base,haiku", help="Comma-separated: sft, sft8b, base, haiku, sonnet"),
     example: Optional[int] = typer.Option(None, help="Run curated example N from configs/demo_examples.json and exit"),
     sft_url: str = typer.Option("http://localhost:8000/v1", help="vLLM URL serving the SFT model"),
     base_url: str = typer.Option("http://localhost:8001/v1", help="vLLM URL serving base Qwen3-1.7B"),
     sft_model: Optional[str] = typer.Option(None, help="Model id served at --sft-url (default: the SFT weights path)"),
+    sft8b_url: str = typer.Option("http://localhost:8002/v1", help="vLLM URL serving the 8B SFT model"),
+    sft8b_model: Optional[str] = typer.Option(None, help="Model id served at --sft8b-url (default: merged 8B export)"),
 ):
     """Demo: ask models an ERCOT question side by side; runs their SQL and grades it when ground truth exists."""
     from rich.console import Console
@@ -229,7 +231,8 @@ def ask(
     from ercot_bench import demo
 
     console = Console()
-    tmap = demo.default_targets(sft_url, base_url, sft_model or demo.SFT_WEIGHTS)
+    tmap = demo.default_targets(sft_url, base_url, sft_model or demo.SFT_WEIGHTS, sft8b_url,
+                                sft8b_model or demo.SFT8B_WEIGHTS)
     chosen = [tmap[t.strip()] for t in targets.split(",") if t.strip()]
     if example is not None:
         ex = demo.load_examples()["examples"][example - 1]
