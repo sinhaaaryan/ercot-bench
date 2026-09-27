@@ -244,10 +244,12 @@ All fine-tunes use the same 802 correct Sonnet solutions (SFT only, no RL yet).
 
 | model | test_in_template | held-out templates | consistent (in-template) | mean output tokens |
 |---|---|---|---|---|
+| Claude Opus 4.1 (claude-cli) | 100.0% | 100.0% | 100.0% | 303 |
 | Claude Sonnet (claude-cli) | 98.1% | 87.7% | 97.1% | 218 |
 | Claude Haiku 4.5 (claude-cli) | 97.6% | 85.2% | 92.9% | 2,949 (reasoning) |
 | Claude Haiku 4.5, thinking off (claude-cli) | 90.0% | 59.3% | 81.4% | 314 |
 | **Qwen3-8B + SFT (LoRA)** | **95.0%** | 58.3% | 88.6% | 109 |
+| **K2-Horizon-7B + SFT + RL (GRPO, LoRA)** | 93.9% | 61.1% | 87.1% | 100 |
 | **K2-Horizon-7B + SFT (LoRA)** | 91.8% | **63.0%** | 82.9% | 101 |
 | Qwen3-1.7B + SFT (full FT) | 83.2% | 53.7% | 74.3% | 111 |
 | K2-Horizon-7B base | 66.8% | 45.4% | 31.4% | 407 (reasoning) |
@@ -262,6 +264,7 @@ Training on one RTX 5090 (all under the memory safeguards):
 | Qwen3-8B SFT | prime-rl, LoRA r32, bf16 params, 40 steps (~3.2 epochs) | 30 min | 20.0 GB |
 | K2-Horizon-7B SFT | `scripts/sft_lora_hf.py`, LoRA r32, 2 epochs | 14 min | 20.1 GB |
 | Qwen3-1.7B RL smoke | prime-rl GRPO, LoRA, 15 steps | 2.5 min | 21.8 GB (incl. vLLM) |
+| K2-Horizon-7B RL | `scripts/grpo_lora_hf.py`, GRPO LoRA r16, 30 steps x 8 prompts x 8 samples | 58 min | 24.8 GB |
 
 - Fine-tuned 7-8B models get within ~3-6 points of Claude on in-template questions while answering in ~100 tokens
   (single-request latency ~1-2 s on the 5090 vs ~7-25 s for Haiku, which reasons for ~3k tokens), self-hosted.
@@ -270,6 +273,12 @@ Training on one RTX 5090 (all under the memory safeguards):
 - **Fine-tuned K2-Horizon-7B beats Claude Haiku 4.5 (thinking off) on both splits (91.8% vs 90.0%, 63.0% vs 59.3%)**
   with a third of the output; Qwen3-8B + SFT beats it in-template (95.0%) and ties held-out (58.3% vs 59.3%).
 - The stronger base (K2) generalizes better after SFT (63.0% held-out) even though Qwen3-8B wins in-template.
+- **RL on K2 (GRPO from the SFT checkpoint)** improved familiar question types: 91.8% -> 93.9% pass@1 and
+  82.9% -> 87.1% consistency (8 test tasks more reliable, 2 less). Held-out types were flat (63.0% -> 61.1%: 2 tasks
+  better, 4 worse, mostly one template; 1 task = 3.7 pts on 27 tasks), consistent with RL only sharpening skills the
+  training tasks exercise. Train reward by thirds: 0.54 -> 0.57 -> 0.68; KL to SFT stayed <= 0.004.
+- Claude Opus 4.1 solves everything (100% / 100%), e.g. the SOC-constrained battery optimum as a recursive-CTE DP:
+  the benchmark ceiling. Haiku 4.5 is the smallest Claude still served (3 Haiku, 3.5 Haiku, Sonnet 3.7, Sonnet 4 retired).
 - RL smoke (LoRA GRPO from the 1.7B SFT checkpoint): per-step reward 0.38-0.88, non-constant, 0 errors.
 - verifiers `eval` on `ercot-sql` vs our harness: 64/64 rewards identical.
 - **Flag (per spec):** Claude is above the ~85% threshold on both splits; templates need to get harder to track
@@ -281,10 +290,30 @@ assistant tokens; LM head applied only to answer positions, which cut peak VRAM 
 250k vocab). Its chat template requires a thinking field, so `data/sft_k2` sets `think_faster=""` and the tuned
 model learns to answer immediately under `reasoning_effort=low`.
 
+## RL on K2-Horizon-7B (single GPU)
+
+Feasibility check (prime-rl): `configs/prime-rl/rl_k2_lora.toml` validates (default renderer, trust_remote_code,
+HF impl + FA2, LoRA), and vLLM's Transformers backend serves K2 with hot-loaded LoRA adapters, so **prime-rl RL on
+K2 works with 2 GPUs**. On one 32 GB GPU it does not fit: vLLM and the trainer each hold the 16.8 GB bf16 model.
+
+On the 5090 we instead use `scripts/grpo_lora_hf.py`: GRPO with **one** copy of the model that both samples (HF
+`generate`, LoRA on) and trains; the KL reference is the same weights with LoRA switched off (= the SFT model).
+Reward = `ercot_bench.env.score.score` (same function as eval and the verifiers taskset). Prompt set: K2-SFT's
+train-split results -> `rl-subset` (92 sometimes-right tasks x3, 8 never-solved, 67 always-solved).
+
+```bash
+uv run ercot-bench eval --backend openai-compat --model <k2 sft> --base-url http://localhost:8003/v1 --split train \
+  --k 4 --use-n --template-kwargs '{"reasoning_effort": "low"}' --out results/train__openai-compat__k2-horizon-7b-sft.jsonl
+uv run ercot-bench rl-subset results/train__openai-compat__k2-horizon-7b-sft.jsonl --out data/tasks/rl_train_k2.jsonl
+cd ../prime-rl && ../ercot-bench/scripts/guarded_run.sh grpo 30G uv run --no-sync python ../ercot-bench/scripts/grpo_lora_hf.py \
+  --model /hackathon/outputs/ercot-sft-k2-lora/merged --tasks ../ercot-bench/data/tasks/rl_train_k2.jsonl \
+  --out /hackathon/outputs/ercot-grpo-k2 --steps 30 --prompts-per-step 8 --group 8 --template-kwargs '{"reasoning_effort": "low"}'
+```
+
 ## Live demo (`ercot-bench ask`)
 
 ```bash
-scripts/demo_servers.sh k2       # K2-Horizon-7B+SFT (:8003) + Qwen3-1.7B base (:8001); or: qwen8b | small | stop
+scripts/demo_servers.sh k2rl     # K2-Horizon-7B+SFT+RL (:8003) + Qwen3-1.7B base (:8001); or: k2 | qwen8b | small | stop
 tmux attach -t ercot             # windows: compare (fine-tuned vs base vs Haiku), finetuned, base, haiku, status
 ```
 

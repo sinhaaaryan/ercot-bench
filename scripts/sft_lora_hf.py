@@ -31,6 +31,8 @@ TARGETS = ("q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down
 
 
 class LoRALinear(nn.Module):
+    active = True  # class-wide switch: False -> behave as the frozen base (used as the RL reference policy)
+
     def __init__(self, base: nn.Linear, rank: int, alpha: float):
         super().__init__()
         self.base = base
@@ -40,6 +42,8 @@ class LoRALinear(nn.Module):
         nn.init.kaiming_uniform_(self.lora_A, a=math.sqrt(5))
 
     def forward(self, x):
+        if not LoRALinear.active:
+            return self.base(x)
         dt = x.dtype
         return self.base(x) + ((x @ self.lora_A.to(dt).T) @ self.lora_B.to(dt).T) * self.scale
 

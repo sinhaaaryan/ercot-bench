@@ -2,6 +2,7 @@
 # Start a demo lineup of vLLM servers (each in a memory-capped ercot-* scope) and (re)build the `ercot` tmux session.
 #   scripts/demo_servers.sh qwen8b   # Qwen3-8B+SFT (:8002) + Qwen3-1.7B base (:8001) + Haiku   [default]
 #   scripts/demo_servers.sh k2       # K2-Horizon-7B+SFT (:8003) + Qwen3-1.7B base (:8001) + Haiku
+#   scripts/demo_servers.sh k2rl     # K2-Horizon-7B+SFT+RL (:8003) + Qwen3-1.7B base (:8001) + Haiku
 #   scripts/demo_servers.sh small    # Qwen3-1.7B+SFT (:8000) + Qwen3-1.7B base (:8001) + Haiku
 #   scripts/demo_servers.sh stop     # stop all demo servers (frees the GPU)
 # VRAM budget: one 7-8B model at 60-68% (K2 needs more: vLLM Transformers backend) + the 1.7B base at 22% ~= 26-29 GB of 32 GB.
@@ -33,7 +34,11 @@ wait_up() {
   local name=$1 port=$2 model=$3
   sleep 3
   until curl -sf "localhost:$port/v1/models" >/dev/null 2>&1; do
-    systemctl --user is-active -q "ercot-$name.scope" || { echo "server $name failed; see /hackathon/infer_${name}.log"; exit 1; }
+    if ! systemctl --user is-active -q "ercot-$name.scope"; then
+      # the first launch of a newly trained model can fail its KV-cache check while vLLM compiles; retry once
+      if [ -z "${ERCOT_DEMO_RETRY:-}" ]; then echo "server $name failed; retrying once"; ERCOT_DEMO_RETRY=1 exec "$0" "$LINEUP"; fi
+      echo "server $name failed; see /hackathon/infer_${name}.log"; exit 1
+    fi
     sleep 5
   done
   echo "up: $name ($model) on :$port"
@@ -42,6 +47,7 @@ wait_up() {
 case "$LINEUP" in
   qwen8b) serve sft8b-serve /hackathon/outputs/ercot-sft-8b-lora/export/merged 8002 0.60; FT=sft8b ;;
   k2)     serve k2sft-serve /hackathon/outputs/ercot-sft-k2-lora/merged 8003 0.64 --vllm.trust-remote-code True; FT=k2sft ;;
+  k2rl)   serve k2sft-serve /hackathon/outputs/ercot-grpo-k2/merged 8003 0.64 --vllm.trust-remote-code True; FT=k2rl ;;
   small)  serve sft /hackathon/outputs/ercot-sft-1p7b/checkpoints/step_80/weights 8000 0.35; FT=sft ;;
   *) echo "unknown lineup $LINEUP"; exit 2 ;;
 esac

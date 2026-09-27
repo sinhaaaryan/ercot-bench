@@ -24,10 +24,12 @@ REPO = Path(__file__).resolve().parents[1]
 
 # (display name, report model id, group)
 MODELS = [
+    ("Claude Opus 4.1", "claude-opus-4-1", "claude"),
     ("Claude Sonnet", "sonnet", "claude"),
     ("Claude Haiku 4.5 (thinking)", "haiku", "claude"),
     ("Claude Haiku 4.5 (no thinking)", "haiku (no thinking)", "claude"),
     ("Qwen3-8B + SFT", "/hackathon/outputs/ercot-sft-8b-lora/export/merged", "ours"),
+    ("K2-Horizon-7B + SFT + RL", "/hackathon/outputs/ercot-grpo-k2/merged", "ours"),
     ("K2-Horizon-7B + SFT", "/hackathon/outputs/ercot-sft-k2-lora/merged", "ours"),
     ("Qwen3-1.7B + SFT", "/hackathon/outputs/ercot-sft-1p7b/checkpoints/step_80/weights", "ours"),
     ("K2-Horizon-7B base", "IFM/K2-Horizon-7B", "base"),
@@ -120,8 +122,8 @@ def draw(data, theme: str, path: Path) -> None:
                     labelcolor=t["text"], handlelength=1.2, borderaxespad=0.3)
     fig.suptitle("ERCOT-Bench: text-to-SQL on Texas grid data", x=0.01, ha="left", y=0.995, fontsize=14,
                  fontweight="bold", color=t["text"])
-    fig.text(0.01, 0.955 - 0.004 * (12 - n), "Fine-tuned K2-Horizon-7B beats Claude Haiku 4.5 (no thinking) on both splits with ~1/3 the output; "
-             "Claude with thinking still leads on held-out question types.", fontsize=9.5, color=t["text2"],
+    fig.text(0.01, 0.955 - 0.004 * (12 - n), "Fine-tuned K2-Horizon-7B beats Claude Haiku 4.5 (no thinking) on both splits with ~1/3 the output; RL adds "
+             "consistency on familiar types. Claude with thinking still leads on held-out types.", fontsize=9.5, color=t["text2"],
              ha="left", va="top")
     ax2.set_title("Answer length", loc="left", fontsize=10, color=t["text"], pad=24)
     fig.subplots_adjust(left=0.24, right=0.975, top=1 - 1.25 / (0.62 * n + 2.2), bottom=0.9 / (0.62 * n + 2.2))
