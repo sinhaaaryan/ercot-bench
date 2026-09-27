@@ -219,7 +219,7 @@ def sft_build(
 @app.command()
 def ask(
     question: Optional[str] = typer.Argument(None, help="Ask once and exit (otherwise interactive REPL)"),
-    targets: str = typer.Option("sft,base,haiku", help="Comma-separated: sft, sft8b, base, haiku, sonnet"),
+    targets: str = typer.Option("sft,base,haiku", help="Comma-separated: sft, sft8b, k2sft, base, haiku, sonnet"),
     example: Optional[int] = typer.Option(None, help="Run curated example N from configs/demo_examples.json and exit"),
     sft_url: str = typer.Option("http://localhost:8000/v1", help="vLLM URL serving the SFT model"),
     base_url: str = typer.Option("http://localhost:8001/v1", help="vLLM URL serving base Qwen3-1.7B"),

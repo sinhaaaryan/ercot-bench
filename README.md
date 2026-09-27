@@ -271,6 +271,19 @@ assistant tokens; LM head applied only to answer positions, which cut peak VRAM 
 250k vocab). Its chat template requires a thinking field, so `data/sft_k2` sets `think_faster=""` and the tuned
 model learns to answer immediately under `reasoning_effort=low`.
 
+## Live demo (`ercot-bench ask`)
+
+```bash
+scripts/demo_servers.sh k2       # K2-Horizon-7B+SFT (:8003) + Qwen3-1.7B base (:8001); or: qwen8b | small | stop
+tmux attach -t ercot             # windows: compare (fine-tuned vs base vs Haiku), finetuned, base, haiku, status
+```
+
+At the `ercot>` prompt: `list`, a number (curated graded example), `f<n>` (free-form), `random [family]`, or any
+question. Each model's SQL is executed and graded against ground truth when the question comes from the task set.
+VRAM: the 7-8B model at 60-64% + the 1.7B base via plain `vllm serve` (small batch, 4k context) at 29% ~= 27 GB.
+Fine-tuned models answer in ~1-2 s; Haiku takes ~7-25 s (it reasons for ~3k tokens). Off-topic questions are not
+refused yet (the models were only trained on answerable questions).
+
 ## Layout
 
 ```

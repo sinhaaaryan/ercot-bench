@@ -31,6 +31,7 @@ from ercot_bench.tasks.schema import Task
 
 SFT_WEIGHTS = "/hackathon/outputs/ercot-sft-1p7b/checkpoints/step_80/weights"
 SFT8B_WEIGHTS = "/hackathon/outputs/ercot-sft-8b-lora/export/merged"
+K2SFT_WEIGHTS = "/hackathon/outputs/ercot-sft-k2-lora/merged"
 
 
 @dataclass
@@ -48,6 +49,9 @@ def default_targets(sft_url: str, base_url: str, sft_model: str, sft8b_url: str 
         "sft": Target("Qwen3-1.7B + SFT", "openai-compat", sft_model, {"base_url": sft_url, **qwen}),
         "base": Target("Qwen3-1.7B (base)", "openai-compat", "Qwen/Qwen3-1.7B", {"base_url": base_url, **qwen}),
         "sft8b": Target("Qwen3-8B + SFT", "openai-compat", sft8b_model, {"base_url": sft8b_url, **qwen}),
+        "k2sft": Target("K2-Horizon-7B + SFT", "openai-compat", K2SFT_WEIGHTS,
+                        {"base_url": "http://localhost:8003/v1", "temperature": 0.0, "max_tokens": 2048,
+                         "extra_body": {"chat_template_kwargs": {"reasoning_effort": "low"}}}),
         "haiku": Target("Claude Haiku 4.5", "claude-cli", "haiku", {}),
         "sonnet": Target("Claude Sonnet", "claude-cli", "sonnet", {}),
     }
