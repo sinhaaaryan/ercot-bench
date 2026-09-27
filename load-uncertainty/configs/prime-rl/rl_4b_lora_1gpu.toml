@@ -1,0 +1,114 @@
+# RL on ONE 32 GB GPU: Qwen3-4B-Instruct-2507 (optionally SFT-warm-started) + LoRA r32/alpha64 on all linear layers.
+# External vLLM (infer_4b_lora.toml, 0.40 of the GPU) + trainer on the same GPU. VRAM budget: docs/TRAINING.md.
+#
+# Preconditions: GPU free; scripts/make_sft_examples.py + SFT done if warm-starting; data/examples/{train,val}.jsonl.
+# Optional: /hackathon/ercot-bench/scripts/mem_guard.sh & (pauses ercot-* scopes before host RAM runs out).
+#
+# terminal 1 - inference, one line (base model; for the SFT warm start add --vllm.model <merged dir>):
+#   cd /hackathon-new && VLLM_USE_V2_MODEL_RUNNER=0 PYTHONPATH=/hackathon-new/src:/hackathon-new/environments/ercot_uncertainty_env /hackathon/prime-rl/.venv/bin/inference @ configs/prime-rl/infer_4b_lora.toml 2>&1 | tee outputs/infer_4b.log
+# terminal 1 - multi-line:
+#   cd /hackathon-new
+#   export VLLM_USE_V2_MODEL_RUNNER=0
+#   export PYTHONPATH=/hackathon-new/src:/hackathon-new/environments/ercot_uncertainty_env
+#   /hackathon/prime-rl/.venv/bin/inference @ configs/prime-rl/infer_4b_lora.toml \
+#       --vllm.model /hackathon-new/outputs/ercot-unc-sft-4b/export/merged \
+#       2>&1 | tee outputs/infer_4b.log
+#
+# terminal 2 - trainer + orchestrator (after `curl -s localhost:8300/v1/models` answers), one line:
+#   cd /hackathon-new && PYTHONPATH=/hackathon-new/src:/hackathon-new/environments/ercot_uncertainty_env /hackathon/prime-rl/.venv/bin/rl @ configs/prime-rl/rl_4b_lora_1gpu.toml --model.name /hackathon-new/outputs/ercot-unc-sft-4b/export/merged --run.name ercot-unc-rl-4b 2>&1 | tee outputs/rl_4b.log
+# terminal 2 - multi-line:
+#   cd /hackathon-new
+#   export PYTHONPATH=/hackathon-new/src:/hackathon-new/environments/ercot_uncertainty_env
+#   /hackathon/prime-rl/.venv/bin/rl @ configs/prime-rl/rl_4b_lora_1gpu.toml \
+#       --model.name /hackathon-new/outputs/ercot-unc-sft-4b/export/merged \
+#       --run.name ercot-unc-rl-4b \
+#       2>&1 | tee outputs/rl_4b.log
+# (--model.name MUST equal the model vLLM serves: the LoRA adapter is registered under that name.
+#  Without SFT, drop --model.name in terminal 2 and --vllm.model in terminal 1.)
+#
+# Optional host-RAM cap (teammate's pattern; kills only this job on OOM instead of the WSL VM): prefix a command with
+#   /hackathon/ercot-bench/scripts/guarded_run.sh <name> <MemoryMax, e.g. 16G>
+max_steps = 100             # ~1.5 min/step estimated (64 rollouts, ~2.5k tokens each) => ~2.5 h; override --max-steps
+seq_len = 4608              # prompt (<= ~4.3k tokens) + 256 completion; must equal vLLM max_model_len
+output_dir = "/hackathon-new/outputs"
+
+[model]
+name = "Qwen/Qwen3-4B-Instruct-2507"   # or the SFT-merged export dir (then also --vllm.model in terminal 1)
+
+[ckpt]
+interval = 25               # trainer DCP (base + LoRA + optimizer, ~8 GB each) + orchestrator state
+keep_last = 20              # 300 steps -> 12 checkpoints (25..300): keep ALL; the best may be an early one
+
+[rollout_transport]         # off the default 5555 so we never collide with the teammate's runs
+type = "zmq"
+port = 5575
+
+[trainer.model]
+optim_cpu_offload = false   # teammate: default optimizer CPU offload OOM'd the 40 GB WSL VM
+# float32 weights (the default) would be 15.0 GiB for 4B and leave no room for vLLM on the same card.
+# NOTE: LoRA params take this dtype too, so LoRA masters + Adam are bf16. At lr 1e-5 a bf16 AdamW step on a
+# kaiming-init lora_A entry (~0.01) is below half an ulp for ~80% of entries (simulated: 19% of entries move in
+# 20 steps; 75% at 5e-5, 96% at 1e-4); lora_B (zero-init) learns fine. If reward is flat, try
+# --trainer.optim.lr 3e-5 (see docs/TRAINING.md "Precision").
+optimization_dtype = "bfloat16"
+reduce_dtype = "bfloat16"
+
+[trainer.model.lora]        # all linear layers (q,k,v,o,gate,up,down) by default
+rank = 32
+alpha = 64.0
+
+[trainer.optim]
+lr = 5e-5                   # peak lr (bf16 CPU sim: ~75% of LoRA-A updates survive rounding vs ~half at 3e-5)
+max_norm = 1.0
+
+[trainer.scheduler]          # warmup 10 -> hold 5e-5 -> linear decay over the final 150 steps to 1e-5
+type = "linear"
+warmup_steps = 10
+decay_steps = 150
+min_lr = 1e-5
+
+[trainer.loss]
+type = "ipo"
+kl_tau = 0.0                # squared-log-ratio penalty vs the rollout policy; "tiny" alternative: 1e-3
+
+[orchestrator]
+batch_size = 64             # rollouts per step = 8 prompts x group_size 8
+group_size = 8
+
+[orchestrator.model.client]
+base_url = "http://localhost:8300/v1"
+
+[orchestrator.train.sampling]
+max_completion_tokens = 256
+temperature = 1.0
+
+[[orchestrator.train.source]]
+name = "ercot-unc"
+shuffle = true
+env.taskset.id = "ercot-uncertainty-env"
+env.taskset.split = "train"
+env.agent.harness.id = "null"
+env.agent.runtime.type = "subprocess"
+
+[orchestrator.eval]
+interval = 25               # plus a startup eval at step 0 (baseline for the curve)
+num_examples = 756          # ALL of val_select (Sep-Nov 2025): checkpoint selection set; Dec-Feb (val_winter) stays untouched
+
+[orchestrator.eval.sampling]
+temperature = 0.0           # greedy = the forecast we would deploy
+max_completion_tokens = 256
+
+[[orchestrator.eval.source]]
+name = "ercot-unc-val-select"
+shuffle = true
+env.taskset.id = "ercot-uncertainty-env"
+env.taskset.split = "val_select"
+env.agent.harness.id = "null"
+env.agent.runtime.type = "subprocess"
+
+# Explicit renderer (a local SFT export path is not in prime-rl's model->renderer map). enable_thinking = true
+# (the qwen3 default) is what matches Qwen3-4B-Instruct-2507's own chat template at the generation prompt
+# (checked token-for-token); false would prefill an empty <think></think> the instruct model never saw.
+[orchestrator.renderer]
+name = "qwen3"
+enable_thinking = true

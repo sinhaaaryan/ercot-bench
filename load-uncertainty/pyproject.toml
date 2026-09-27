@@ -1,0 +1,34 @@
+[project]
+name = "ercot-uncertainty"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Ryan Huang", email = "dsammsh@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "catboost>=1.2.10",
+    "duckdb>=1.5.5",
+    "gridstatus>=0.36.0",
+    "lightgbm>=4.7.0",
+    "numpy>=2.5.3",
+    "openai>=3.19.2",
+    "pandas>=2.3.3",
+    "pyarrow>=25.0.1",
+    "pytest>=9.1.1",
+    "python-dotenv>=1.2.3",
+    "quantile-forest>=1.4.2",
+    "requests>=2.34.2",
+    "scikit-learn>=1.9.1",
+    "tabulate>=0.10.0",
+    "xgboost>=3.4.1",
+]
+
+[project.scripts]
+ercot-uncertainty-eval = "ercot_uncertainty.eval:main"
+ercot-uncertainty-report = "ercot_uncertainty.eval_report:main"
+
+[build-system]
+requires = ["uv_build>=0.11.14,<0.12.0"]
+build-backend = "uv_build"

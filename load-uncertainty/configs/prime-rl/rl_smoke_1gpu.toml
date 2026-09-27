@@ -1,0 +1,100 @@
+# RL smoke test, ONE 32 GB GPU: Qwen3-1.7B + LoRA r32, 10 steps, checkpoint every 5 steps, eval on val every 5.
+# Uses the SYNTHETIC smoke split (data/examples/smoke) so it can run before the real dataset exists;
+# for a smoke on real data add: --orchestrator.train.source.0.env.taskset.split train (and val for eval).
+# Same code path as the 4B run (external vLLM with --enable-lora, LoRA adapters broadcast via the filesystem).
+# Full sequence, VRAM budget and what to watch: docs/TRAINING.md.
+#
+# Preconditions: GPU free (check /usr/lib/wsl/lib/nvidia-smi), weights in $HF_HOME (Qwen3-1.7B is pre-downloaded).
+#
+# terminal 1 - inference (~0.30 of the GPU = 9.6 GiB), one line:
+#   cd /hackathon-new && VLLM_USE_V2_MODEL_RUNNER=0 PYTHONPATH=/hackathon-new/src:/hackathon-new/environments/ercot_uncertainty_env /hackathon/prime-rl/.venv/bin/inference @ configs/prime-rl/infer_smoke_1p7b.toml 2>&1 | tee outputs/infer_smoke.log
+# terminal 1 - multi-line:
+#   cd /hackathon-new
+#   export VLLM_USE_V2_MODEL_RUNNER=0
+#   export PYTHONPATH=/hackathon-new/src:/hackathon-new/environments/ercot_uncertainty_env
+#   /hackathon/prime-rl/.venv/bin/inference @ configs/prime-rl/infer_smoke_1p7b.toml \
+#       2>&1 | tee outputs/infer_smoke.log
+#
+# terminal 2 - trainer + orchestrator (after `curl -s localhost:8300/v1/models` answers), one line:
+#   cd /hackathon-new && PYTHONPATH=/hackathon-new/src:/hackathon-new/environments/ercot_uncertainty_env /hackathon/prime-rl/.venv/bin/rl @ configs/prime-rl/rl_smoke_1gpu.toml --run.name ercot-unc-smoke 2>&1 | tee outputs/rl_smoke.log
+# terminal 2 - multi-line:
+#   cd /hackathon-new
+#   export PYTHONPATH=/hackathon-new/src:/hackathon-new/environments/ercot_uncertainty_env
+#   /hackathon/prime-rl/.venv/bin/rl @ configs/prime-rl/rl_smoke_1gpu.toml \
+#       --run.name ercot-unc-smoke \
+#       2>&1 | tee outputs/rl_smoke.log
+#
+# Done when: 10 "Step N" lines in both trainer and orchestrator logs, outputs/ercot-unc-smoke/checkpoints/step_5 and
+# step_10 exist, and eval/ercot-unc-smoke-val metrics were logged. Then test resume (docs/TRAINING.md#resume).
+# Re-running with the same run.name needs --clean (fresh) or --resume (continue).
+max_steps = 10
+seq_len = 4608              # prompt (<= ~4.3k tokens) + 256 completion; must equal vLLM max_model_len
+output_dir = "/hackathon-new/outputs"
+
+[model]
+name = "Qwen/Qwen3-1.7B"
+
+[ckpt]
+interval = 5                # trainer (LoRA + optimizer, DCP) and orchestrator state; final step is always saved
+keep_last = 2
+
+[rollout_transport]         # off the default 5555 so we never collide with the teammate's runs
+type = "zmq"
+port = 5575
+
+[trainer.model]
+optim_cpu_offload = false   # teammate: default optimizer CPU offload OOM'd the 40 GB WSL VM
+# default float32 weights here (1.7B fits); see rl_4b_lora_1gpu.toml for why 4B uses bf16
+
+[trainer.model.lora]        # all linear layers (q,k,v,o,gate,up,down) by default
+rank = 32
+alpha = 64.0
+
+[trainer.optim]
+lr = 1e-5
+
+[trainer.loss]
+type = "ipo"
+kl_tau = 0.0                # squared-log-ratio penalty vs the rollout policy (no reference model in prime-rl)
+
+[orchestrator]
+batch_size = 16             # rollouts per step = 2 prompts x group_size 8
+group_size = 8
+
+[orchestrator.model.client]
+base_url = "http://localhost:8300/v1"
+
+[orchestrator.train.sampling]
+max_completion_tokens = 256
+temperature = 1.0
+
+[[orchestrator.train.source]]
+name = "ercot-unc-smoke"
+shuffle = true
+env.taskset.id = "ercot-uncertainty-env"
+env.taskset.split = "smoke/train"
+env.agent.harness.id = "null"
+env.agent.runtime.type = "subprocess"
+
+[orchestrator.eval]
+interval = 5
+
+[orchestrator.eval.sampling]
+temperature = 0.0           # greedy = the forecast we would deploy
+# eval goes through /chat/completions (not the renderer), so Qwen3-1.7B's template would default to thinking
+# mode and burn all 256 tokens inside <think>; train rollouts already use the renderer's enable_thinking=false
+extra_body = { chat_template_kwargs = { enable_thinking = false } }
+max_completion_tokens = 256
+
+[[orchestrator.eval.source]]
+name = "ercot-unc-smoke-val"
+env.taskset.id = "ercot-uncertainty-env"
+env.taskset.split = "smoke/val"
+env.agent.harness.id = "null"
+env.agent.runtime.type = "subprocess"
+
+# Qwen3-1.7B is a hybrid thinking model: keep thinking off (256-token budget). qwen3 renderer is the
+# parity-tested one for this model (checked against the HF chat template).
+[orchestrator.renderer]
+name = "qwen3"
+enable_thinking = false

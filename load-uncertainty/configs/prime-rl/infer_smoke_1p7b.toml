@@ -1,0 +1,19 @@
+# vLLM for rl_smoke_1gpu.toml (Qwen3-1.7B, LoRA hot-swap). Launch commands: see rl_smoke_1gpu.toml.
+# Router on :8300 (orchestrator base_url), engine on :8310 -- off the teammate's 8000/8100/800x ports.
+output_dir = "/hackathon-new/outputs"
+backend_port = 8310
+
+[server]
+port = 8300
+
+[env_vars]
+VLLM_USE_V2_MODEL_RUNNER = "0"   # teammate: V2 model runner fails on WSL2
+
+[vllm]
+model = "Qwen/Qwen3-1.7B"
+max_model_len = 4608             # = rl seq_len
+gpu_memory_utilization = 0.30    # ~9.6 GiB: 3.3 weights + ~1 LoRA/non-torch + ~1.2 act + ~0.5 graphs + ~3.5 KV (~33k tokens)
+enable_lora = true
+max_lora_rank = 32
+max_loras = 1
+data_parallel_rpc_port = 13355   # off the default 13345

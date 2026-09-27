@@ -1,0 +1,68 @@
+# SFT v2: fixes v1's two problems (see docs/TRAINING.md "SFT v2"): renderer = default (no <think> wrapper) and
+# jittered targets (scripts/make_sft_examples.py --jitter-width-sd 0.15 --jitter-shift-sd 0.10) so the policy keeps
+# exploring around the baseline instead of copying it exactly.
+# Short SFT warm start, ONE 32 GB GPU: Qwen3-4B-Instruct-2507 + LoRA r32/alpha64, target = the numeric baseline's
+# percentiles as JSON (scripts/make_sft_examples.py). Teaches the output format and to anchor on the baseline, so RL
+# starts near reward 0 with ~100% parse rate instead of spending steps on format. Mirrors the teammate's working
+# /hackathon/ercot-bench/configs/prime-rl/sft_1gpu_qwen3_8b_lora.toml (bf16 base, LoRA, no optimizer CPU offload).
+# Runs alone on the GPU (no vLLM). Est. peak ~12 GiB (7.5 weights + 0.5 LoRA/Adam + ~3-4 act at 2x4608 tokens).
+#
+# Build data first (one line):
+#   cd /hackathon-new && /hackathon/prime-rl/.venv/bin/python scripts/make_sft_examples.py
+# Train, one line:
+#   cd /hackathon-new && PYTHONPATH=/hackathon-new/src /hackathon/prime-rl/.venv/bin/sft @ configs/prime-rl/sft_4b_lora_1gpu.toml --run.name ercot-unc-sft-4b 2>&1 | tee outputs/sft_4b.log
+# Train, multi-line:
+#   cd /hackathon-new
+#   /hackathon/prime-rl/.venv/bin/python scripts/make_sft_examples.py
+#   /hackathon/prime-rl/.venv/bin/sft @ configs/prime-rl/sft_4b_lora_1gpu.toml \
+#       --run.name ercot-unc-sft-4b \
+#       2>&1 | tee outputs/sft_4b.log
+# Export (prime-rl's convert_dcp_to_bf16.py rejects LoRA checkpoints; GPU should be free), one line:
+#   cd /hackathon-new && /hackathon/prime-rl/.venv/bin/python scripts/export_lora_merged.py outputs/ercot-unc-sft-4b/checkpoints/step_40 outputs/ercot-unc-sft-4b/export
+# -> outputs/ercot-unc-sft-4b/export/merged is an HF model dir: serve it with vLLM and use it as rl --model.name.
+#
+# Note: prime-rl's qwen3 renderer trains the assistant turn as "<think>\n\n</think>\n\n{json}" (the Qwen3 template
+# wraps the final assistant turn; Instruct-2507's own template does not). The SFT model therefore emits that empty
+# wrapper (6 tokens) before the JSON at RL/eval time; task.py's parser ignores it. Harmless, but known.
+max_steps = 40              # 16 packed 4608-token samples/step (~1-2 examples each) => ~800-1000 examples seen
+output_dir = "/hackathon-new/outputs"
+
+[ckpt]                      # final checkpoint only (each is a full ~8 GB DCP incl. the frozen base)
+
+[model]
+name = "Qwen/Qwen3-4B-Instruct-2507"
+optim_cpu_offload = false
+# bf16 base (7.5 GiB) like the teammate's 8B SFT; float32 (15 GiB) also fits when the GPU is otherwise free.
+optimization_dtype = "bfloat16"
+reduce_dtype = "bfloat16"
+
+[model.lora]
+rank = 32
+alpha = 64.0
+
+[renderer]
+# "prime-qwen3" is token-identical to Qwen3-4B-Instruct-2507's own chat template (checked on 50/50 random SFT
+# examples; prime-rl SFT rejects the generic "default" renderer). The "qwen3" renderer always wraps the FINAL assistant turn in an empty
+# <think>\n\n</think>\n\n (either enable_thinking value), tokens this instruct model never uses; SFT v1 learned
+# them and at temperature 1 confused them with the adjacent <tool_call> tokens (33% unparseable samples).
+name = "prime-qwen3"
+
+[data]
+name = "/hackathon-new/data/examples/sft_jitter"
+seq_len = 4608
+batch_size = 16
+micro_batch_size = 2
+
+[optim]
+lr = 1e-4
+
+[val]                       # validation loss on data/examples/sft/validation.jsonl
+interval = 20
+
+[val.data]
+name = "/hackathon-new/data/examples/sft_jitter"
+splits = ["validation"]
+seq_len = 4608
+batch_size = 16
+micro_batch_size = 2
+shuffle = false

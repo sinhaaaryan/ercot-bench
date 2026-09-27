@@ -1,0 +1,433 @@
+
+360 
+FXUS64 KFWD 011939
+AFDFWD
+
+Area Forecast Discussion
+National Weather Service Fort Worth TX
+239 PM CDT Sat Jul 1 2023
+
+...New Long Term... 
+
+.SHORT TERM... /Issued 1156 AM CDT Sat Jul 1 2023/
+/This afternoon through Sunday/
+
+Showers and storms that developed across the Big Country this
+morning near a weak cold front continue to move into the western
+zones late this morning. Considerable cloud cover and lower 
+instability will neutralize the storms quickly as they move east 
+across North Texas.
+
+A well defined outflow has moved well out ahead of the storms and
+will likely be a source for scattered afternoon convection across
+parts of North and Central Texas. The best instability resides 
+near and south of the I-20 corridor and this is also the region 
+that has seen the least amount of cloud cover this morning, so we
+will keep afternoon PoPs highest there. Storms will be possible 
+through the evening, but a loss of surface heating and lack of 
+large scale support will result in a decrease in coverage. Any 
+storms that develop this afternoon will have a potential to 
+produce gusty outflow winds and possibly small hail. 
+
+Even though many areas will not see appreciable rainfall this
+afternoon, extensive cloud cover will keep temperatures
+considerably cooler than they have been in several days. We will 
+lower afternoon highs in most locations with many of the western 
+zones struggling to get out of the 80s (a great way to start 
+July).
+
+Sunday will remain unsettled with troughing in place aloft and
+multiple outflow boundaries lingering across the region. We will
+keep low chance PoPs (generally 20%-40%) for the entire forecast 
+area. The good news is that the day will not be a washout anywhere
+and plenty of cloud cover will keep afternoon highs near or even 
+below normal in some locations. 
+
+79
+
+&&
+
+.LONG TERM... /NEW/
+Update:
+No significant changes were made to the long term forecast.
+Seasonably hot temperatures and daily diurnally driven rain/storm
+chances will continue through most of the week, including through
+the 4th of July holiday. While severe weather is not expected,
+frequent lightning and gusty winds will be hazardous to those who
+are outdoors.
+
+Garcia
+
+Previous Discussion:
+/Sunday Night Onward/
+
+Sunday afternoon convection will linger into the evening hours, 
+but should dissipate by midnight with the loss of surface 
+instability. A weak, positive tilt trough will linger overhead in 
+the days that follow, leading to diurnally driven convection each 
+afternoon through the middle of next week. Showers and storms will
+be disorganized, and will likely initiate along mesoscale 
+boundaries left over from activity in the preceding days. Pops 
+each day will be in the chance to slight chance categories due to
+the expectation of convection being isolated to scattered in 
+nature. 
+
+It still appears that Thursday may be one of our better 
+opportunities to receive rain as a large scale trough sweeps 
+through the Northern and Central Plains, and a pair of shortwaves
+swing around its base. The initial shortwave will pass through 
+the area during the day, generating the first round of scattered 
+showers and storms. The best chances at this time look to be 
+across the eastern half of the forecast area where the stronger 
+lift will be. As these storms are exiting to the southeast, a 
+second batch associated with the next shortwave will be 
+approaching from the northwest Thursday evening. The best rain 
+chances associated with the second shortwave will likely be along 
+the Red River, with storms weakening the farther south they get. 
+There is still a lot of uncertainty regarding exact timing and 
+areal coverage, but we should be able to narrow it down as we get 
+in range of higher resolution model guidance. As far as the 
+severity of the convection each day, weak flow aloft will keep the
+majority of the storms sub-severe, though isolated damaging wind 
+gusts could occur in the stronger storms. 
+
+Whatever the case, it looks like our rain chances will dwindle
+Friday through next weekend as the mid level ridge moves in from
+the west, regains control, and returns typical July Texas weather
+to the region.
+
+30
+&&
+
+.AVIATION... /Issued 1258 PM CDT Sat Jul 1 2023/
+/18Z TAFs/
+
+The primary aviation weather concern is thunderstorm timing as
+well as any temporary wind shifts due to outflow boundaries.
+
+Convection west of the Metroplex TAF sites will continue to 
+weaken as it moves into slightly more stable air. However, there 
+is enough instability to warrant the mention of thunder in the 
+vicinity of all Metroplex terminals this afternoon. It appears 
+that the better instability will reside just to the south along 
+and ahead of a well defined outflow boundary (near a line from 
+Goldthwaite to Hillsboro to Greenville at 1230 PM). The area 
+south of the boundary has also seen the most sun today and will 
+continue to destabilize through the afternoon. For now, we left 
+thunder out of the Waco TAF but we will continue to monitor the 
+progress of the outflow for future updates. Convective trends 
+Sunday should be very similar to today with scattered storms 
+during the heat of the day.
+
+Otherwise, expect VFR with broken to overcast middle and high
+clouds and few to scattered Cu.  
+
+A west to northwest wind at the start of the TAF cycle at the
+Metroplex terminals will become more southwest/south through the
+afternoon once the outflow moves a bit farther south. Southerly
+flow will continue overnight and Sunday outside of any convective
+outflows that may develop. Prevailing wind speeds will remain 
+generally below 12 knots. 
+
+79
+
+&&
+
+
+.PRELIMINARY POINT TEMPS/POPS...
+Dallas-Ft. Worth    79  95  77  97  78 /  20  40  10  20  10 
+Waco                78  96  77  95  76 /   5  20  10  10   5 
+Paris               75  91  74  92  74 /  20  30  20  30  10 
+Denton              75  96  75  98  76 /  20  40  10  20  10 
+McKinney            75  92  75  94  76 /  20  40  10  20  10 
+Dallas              79  95  77  96  78 /  20  40  10  20  10 
+Terrell             77  94  75  95  76 /  10  30  10  20  10 
+Corsicana           79  97  77  95  78 /  10  20  10  10  10 
+Temple              76  98  76  97  76 /   5  10  10   5   5 
+Mineral Wells       75  95  73  98  75 /  20  30  10  10  10 
+
+&&
+
+.FWD WATCHES/WARNINGS/ADVISORIES...
+None.
+&&
+
+$$
+
+
+
+415 
+FXUS64 KFWD 011758
+AFDFWD
+
+Area Forecast Discussion
+National Weather Service Fort Worth TX
+1258 PM CDT Sat Jul 1 2023
+
+...New Aviation... 
+
+.SHORT TERM... /Issued 1156 AM CDT Sat Jul 1 2023/
+/This afternoon through Sunday/
+
+Showers and storms that developed across the Big Country this
+morning near a weak cold front continue to move into the western
+zones late this morning. Considerable cloud cover and lower 
+instability will neutralize the storms quickly as they move east 
+across North Texas.
+
+A well defined outflow has moved well out ahead of the storms and
+will likely be a source for scattered afternoon convection across
+parts of North and Central Texas. The best instability resides 
+near and south of the I-20 corridor and this is also the region 
+that has seen the least amount of cloud cover this morning, so we
+will keep afternoon PoPs highest there. Storms will be possible 
+through the evening, but a loss of surface heating and lack of 
+large scale support will result in a decrease in coverage. Any 
+storms that develop this afternoon will have a potential to 
+produce gusty outflow winds and possibly small hail. 
+
+Even though many areas will not see appreciable rainfall this
+afternoon, extensive cloud cover will keep temperatures
+considerably cooler than they have been in several days. We will 
+lower afternoon highs in most locations with many of the western 
+zones struggling to get out of the 80s (a great way to start 
+July).
+
+Sunday will remain unsettled with troughing in place aloft and
+multiple outflow boundaries lingering across the region. We will
+keep low chance PoPs (generally 20%-40%) for the entire forecast 
+area. The good news is that the day will not be a washout anywhere
+and plenty of cloud cover will keep afternoon highs near or even 
+below normal in some locations. 
+
+79
+
+&&
+
+.LONG TERM... /Issued 234 AM CDT Sat Jul 1 2023/
+/Sunday Night Onward/
+
+Sunday afternoon convection will linger into the evening hours, 
+but should dissipate by midnight with the loss of surface 
+instability. A weak, positive tilt trough will linger overhead in 
+the days that follow, leading to diurnally driven convection each 
+afternoon through the middle of next week. Showers and storms will
+be disorganized, and will likely initiate along mesoscale 
+boundaries left over from activity in the preceding days. Pops 
+each day will be in the chance to slight chance categories due to
+the expectation of convection being isolated to scattered in 
+nature. 
+
+It still appears that Thursday may be one of our better 
+opportunities to receive rain as a large scale trough sweeps 
+through the Northern and Central Plains, and a pair of shortwaves
+swing around its base. The initial shortwave will pass through 
+the area during the day, generating the first round of scattered 
+showers and storms. The best chances at this time look to be 
+across the eastern half of the forecast area where the stronger 
+lift will be. As these storms are exiting to the southeast, a 
+second batch associated with the next shortwave will be 
+approaching from the northwest Thursday evening. The best rain 
+chances associated with the second shortwave will likely be along 
+the Red River, with storms weakening the farther south they get. 
+There is still a lot of uncertainty regarding exact timing and 
+areal coverage, but we should be able to narrow it down as we get 
+in range of higher resolution model guidance. As far as the 
+severity of the convection each day, weak flow aloft will keep the
+majority of the storms sub-severe, though isolated damaging wind 
+gusts could occur in the stronger storms. 
+
+Whatever the case, it looks like our rain chances will dwindle
+Friday through next weekend as the mid level ridge moves in from
+the west, regains control, and returns typical July Texas weather
+to the region.
+
+30
+&&
+
+.AVIATION... /NEW/
+/18Z TAFs/
+
+The primary aviation weather concern is thunderstorm timing as
+well as any temporary wind shifts due to outflow boundaries.
+
+Convection west of the Metroplex TAF sites will continue to 
+weaken as it moves into slightly more stable air. However, there 
+is enough instability to warrant the mention of thunder in the 
+vicinity of all Metroplex terminals this afternoon. It appears 
+that the better instability will reside just to the south along 
+and ahead of a well defined outflow boundary (near a line from 
+Goldthwaite to Hillsboro to Greenville at 1230 PM). The area 
+south of the boundary has also seen the most sun today and will 
+continue to destabilize through the afternoon. For now, we left 
+thunder out of the Waco TAF but we will continue to monitor the 
+progress of the outflow for future updates. Convective trends 
+Sunday should be very similar to today with scattered storms 
+during the heat of the day.
+
+Otherwise, expect VFR with broken to overcast middle and high
+clouds and few to scattered Cu.  
+
+A west to northwest wind at the start of the TAF cycle at the
+Metroplex terminals will become more southwest/south through the
+afternoon once the outflow moves a bit farther south. Southerly
+flow will continue overnight and Sunday outside of any convective
+outflows that may develop. Prevailing wind speeds will remain 
+generally below 12 knots. 
+
+79
+
+&&
+
+
+.PRELIMINARY POINT TEMPS/POPS...
+Dallas-Ft. Worth    94  79  95  78  97 /  30  20  40  20  20 
+Waco                97  78  96  77  95 /  20   5  20  10  20 
+Paris               94  75  91  73  92 /  20  20  30  20  30 
+Denton              94  75  96  75  98 /  40  20  40  20  30 
+McKinney            94  75  92  75  94 /  30  20  40  20  30 
+Dallas              94  79  95  78  97 /  30  20  40  20  20 
+Terrell             98  77  94  75  96 /  30  10  30  20  20 
+Corsicana           98  79  97  78  96 /  20  10  20  10  20 
+Temple              98  76  98  75  96 /  20   5  10   5  20 
+Mineral Wells       92  75  95  74  98 /  40  20  30  10  20 
+
+&&
+
+.FWD WATCHES/WARNINGS/ADVISORIES...
+None.
+&&
+
+$$
+
+
+
+071 
+FXUS64 KFWD 011656
+AFDFWD
+
+Area Forecast Discussion
+National Weather Service Fort Worth TX
+1156 AM CDT Sat Jul 1 2023
+
+...New Short Term
+
+.SHORT TERM... /NEW/
+/This afternoon through Sunday/
+
+Showers and storms that developed across the Big Country this
+morning near a weak cold front continue to move into the western
+zones late this morning. Considerable cloud cover and lower 
+instability will neutralize the storms quickly as they move east 
+across North Texas.
+
+A well defined outflow has moved well out ahead of the storms and
+will likely be a source for scattered afternoon convection across
+parts of North and Central Texas. The best instability resides 
+near and south of the I-20 corridor and this is also the region 
+that has seen the least amount of cloud cover this morning, so we
+will keep afternoon PoPs highest there. Storms will be possible 
+through the evening, but a loss of surface heating and lack of 
+large scale support will result in a decrease in coverage. Any 
+storms that develop this afternoon will have a potential to 
+produce gusty outflow winds and possibly small hail. 
+
+Even though many areas will not see appreciable rainfall this
+afternoon, extensive cloud cover will keep temperatures
+considerably cooler than they have been in several days. We will 
+lower afternoon highs in most locations with many of the western 
+zones struggling to get out of the 80s (a great way to start 
+July).
+
+Sunday will remain unsettled with troughing in place aloft and
+multiple outflow boundaries lingering across the region. We will
+keep low chance PoPs (generally 20%-40%) for the entire forecast 
+area. The good news is that the day will not be a washout anywhere
+and plenty of cloud cover will keep afternoon highs near or even 
+below normal in some locations. 
+
+79
+
+&&
+
+.LONG TERM... /Issued 234 AM CDT Sat Jul 1 2023/
+/Sunday Night Onward/
+
+Sunday afternoon convection will linger into the evening hours, 
+but should dissipate by midnight with the loss of surface 
+instability. A weak, positive tilt trough will linger overhead in 
+the days that follow, leading to diurnally driven convection each 
+afternoon through the middle of next week. Showers and storms will
+be disorganized, and will likely initiate along mesoscale 
+boundaries left over from activity in the preceding days. Pops 
+each day will be in the chance to slight chance categories due to
+the expectation of convection being isolated to scattered in 
+nature. 
+
+It still appears that Thursday may be one of our better 
+opportunities to receive rain as a large scale trough sweeps 
+through the Northern and Central Plains, and a pair of shortwaves
+swing around its base. The initial shortwave will pass through 
+the area during the day, generating the first round of scattered 
+showers and storms. The best chances at this time look to be 
+across the eastern half of the forecast area where the stronger 
+lift will be. As these storms are exiting to the southeast, a 
+second batch associated with the next shortwave will be 
+approaching from the northwest Thursday evening. The best rain 
+chances associated with the second shortwave will likely be along 
+the Red River, with storms weakening the farther south they get. 
+There is still a lot of uncertainty regarding exact timing and 
+areal coverage, but we should be able to narrow it down as we get 
+in range of higher resolution model guidance. As far as the 
+severity of the convection each day, weak flow aloft will keep the
+majority of the storms sub-severe, though isolated damaging wind 
+gusts could occur in the stronger storms. 
+
+Whatever the case, it looks like our rain chances will dwindle
+Friday through next weekend as the mid level ridge moves in from
+the west, regains control, and returns typical July Texas weather
+to the region.
+
+30
+&&
+
+
+.AVIATION...
+/12z TAFs/
+
+Southwest winds now prevail following a westerly wind shift 
+overnight which was the result of convective outflow. Winds will 
+likely oscillate between west and southwest through most of today,
+with low chances for convective impacts at the airports during 
+the early/mid afternoon time period. Following a lull in 
+convective potential later in the evening/overnight period, 
+additional scattered storms are possible heading into Sunday, but 
+timing and coverage remain too uncertain to introduce any TS near 
+the end of the valid TAF period. 
+
+-Stalley
+
+&&
+
+
+.PRELIMINARY POINT TEMPS/POPS...
+Dallas-Ft. Worth    94  79  95  78  97 /  30  20  40  20  20 
+Waco                97  78  96  77  95 /  10   5  20  10  20 
+Paris               94  75  91  73  92 /  20  20  30  20  30 
+Denton              94  75  96  75  98 /  30  20  40  20  30 
+McKinney            94  75  92  75  94 /  30  20  40  20  30 
+Dallas              94  79  95  78  97 /  20  20  40  20  20 
+Terrell             98  77  94  75  96 /  20  10  30  20  20 
+Corsicana           98  79  97  78  96 /   0  10  20  10  20 
+Temple              98  76  98  75  96 /   5   5  10   5  20 
+Mineral Wells       92  75  95  74  98 /  40  20  30  10  20 
+
+&&
+
+.FWD WATCHES/WARNINGS/ADVISORIES...
+None.
+&&
+
+$$
+
+

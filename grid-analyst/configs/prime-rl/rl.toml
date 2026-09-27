@@ -1,0 +1,61 @@
+# prime-rl RL (GRPO) on the ercot-sql verifiers taskset.
+#   ercot-bench rl-subset results/train__openai-compat__<sft-model>.jsonl   # -> data/tasks/rl_train.jsonl
+#   cd <prime-rl checkout> && uv pip install -e /path/to/ercot-bench/environments/ercot_sql
+#   uv run rl @ /path/to/ercot-bench/configs/prime-rl/rl.toml --model.name <sft checkpoint or HF id> --run.name ercot-rl
+max_steps = 200
+seq_len = 6144
+
+[model]
+name = "Qwen/Qwen3-8B"          # replace with the SFT checkpoint (HF-format) when available
+
+[trainer.model.lora]   # LoRA RL (weights broadcast via filesystem); delete for full fine-tuning
+rank = 32
+alpha = 64.0
+
+[orchestrator]
+batch_size = 64
+group_size = 8
+
+[orchestrator.train.sampling]
+max_completion_tokens = 1024
+temperature = 1.0
+
+[[orchestrator.train.source]]
+name = "ercot-sql-train"
+env.taskset.id = "ercot-sql"
+# weighted toward tasks the SFT model gets wrong / inconsistently right (ercot-bench rl-subset)
+env.taskset.split = "../ercot-bench/grid-analyst/data/tasks/rl_train.jsonl"
+env.agent.harness.id = "null"
+env.agent.runtime.type = "subprocess"
+
+[orchestrator.eval]
+interval = 20
+
+[orchestrator.eval.sampling]
+max_completion_tokens = 1024
+temperature = 0.7
+
+[[orchestrator.eval.source]]
+name = "ercot-sql-test-in-template"
+num_examples = 64
+env.taskset.id = "ercot-sql"
+env.taskset.split = "test_in_template"
+env.taskset.subset_size = 64
+env.agent.harness.id = "null"
+env.agent.runtime.type = "subprocess"
+
+[[orchestrator.eval.source]]
+name = "ercot-sql-test-heldout"
+num_examples = 64
+env.taskset.id = "ercot-sql"
+env.taskset.split = "test_heldout_templates"
+env.taskset.subset_size = 64
+env.agent.harness.id = "null"
+env.agent.runtime.type = "subprocess"
+
+[trainer.optim]
+lr = 2e-5
+
+[ckpt]
+
+[inference]

@@ -1,0 +1,40 @@
+# Single-GPU LoRA SFT of IFM/K2-Horizon-7B (9.0B params incl. 250k vocab, custom code) on ERCOT-Bench data.
+# Same recipe as sft_1gpu_qwen3_8b_lora.toml. K2 specifics:
+# - trust_remote_code + HF implementation (no prime-rl custom kernel for K2HorizonForCausalLM)
+# - chat template needs a thinking field on assistant turns: data/sft_k2 adds think_faster="" so the model learns to
+#   close the reasoning block immediately and answer (serve with chat_template_kwargs reasoning_effort="low")
+# - renderer "default" (K2 is not in the renderer map)
+#   ../ercot-bench/grid-analyst/scripts/guarded_run.sh sftk2 30G uv run sft @ ../ercot-bench/grid-analyst/configs/prime-rl/sft_1gpu_k2_horizon_7b_lora.toml \
+#     --data.name ../ercot-bench/grid-analyst/data/sft_k2 --run.name ercot-sft-k2-lora
+max_steps = 40
+
+[ckpt]
+
+[model]
+name = "IFM/K2-Horizon-7B"
+impl = "hf"
+attn = "flash_attention_2"   # FA4 (auto on Blackwell) requires prime-rl custom impl
+trust_remote_code = true
+optim_cpu_offload = false
+optimization_dtype = "bfloat16"
+reduce_dtype = "bfloat16"
+
+[model.lora]
+rank = 32
+alpha = 64.0
+
+[tokenizer]
+trust_remote_code = true
+
+[renderer]
+name = "default"
+reasoning_effort = "low"
+
+[data]
+name = "../ercot-bench/grid-analyst/data/sft_k2"
+seq_len = 4096
+batch_size = 32
+micro_batch_size = 4
+
+[optim]
+lr = 1e-4

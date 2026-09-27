@@ -1,0 +1,24 @@
+# vLLM for rl_4b_lora_1gpu.toml (Qwen3-4B-Instruct-2507 or its SFT-merged export, LoRA hot-swap).
+# Launch commands: see rl_4b_lora_1gpu.toml. To serve the SFT warm start instead of the base model, add
+#   --vllm.model /hackathon-new/outputs/ercot-unc-sft-4b/export/merged   (and pass the SAME path as rl --model.name).
+# Router on :8300 (orchestrator base_url), engine on :8310 -- off the teammate's 8000/8100/800x ports.
+output_dir = "/hackathon-new/outputs"
+backend_port = 8310
+
+[server]
+port = 8300
+
+[env_vars]
+VLLM_USE_V2_MODEL_RUNNER = "0"   # teammate: V2 model runner fails on WSL2
+
+[vllm]
+model = "Qwen/Qwen3-4B-Instruct-2507"
+max_model_len = 4608             # = rl seq_len
+# 0.40 x 31.84 GiB = 12.7 GiB: 7.5 weights + ~1.0 LoRA/non-torch + ~1.3 peak act + ~0.6 CUDA graphs
+# -> ~2.3 GiB KV = ~17k tokens (144 KiB/token). Groups share the prompt prefix (prefix caching), so that is
+# ~3-4 groups of 8 in flight. Can go to 0.50 (+3.2 GiB KV) -- see docs/TRAINING.md budget table.
+gpu_memory_utilization = 0.40
+enable_lora = true
+max_lora_rank = 32
+max_loras = 1
+data_parallel_rpc_port = 13355   # off the default 13345

@@ -1,0 +1,354 @@
+
+803 
+FXUS64 KFWD 312342
+AFDFWD
+
+Area Forecast Discussion
+National Weather Service Fort Worth TX
+642 PM CDT Sun Aug 31 2025
+
+...New Aviation, Short Term... 
+
+.KEY MESSAGES...
+
+- Scattered thunderstorms will continue to impact North and
+  Central Texas through tomorrow. 
+ 
+- Locally heavy rainfall up to 1 to 3 inches is possible in a few
+  areas where slow moving thunderstorms occur.
+ 
+- Following cooler temperatures today, highs will return to the 
+  mid 80s to mid 90s the rest of the week.
+
+&&
+
+.SHORT TERM... /NEW/
+Update:
+Cancelled the Flood Watch earlier as heavy rains had moved out of
+Central Texas, although some scattered light rain continues.
+Additional scattered showers have also developed across North
+Texas and are moving slowly southward, with some locally heavy
+rain in a few spots. Based on radar trends and latest guidance,
+made considerable updates to precip chances for the rest of the
+night with mainly chance pops for most of the area. Patchy fog
+also appears likely overnight given the very moist low level
+airmass, near-zero dewpoint depressions and wet ground. 
+
+
+Shamburger
+
+Previous Discussion:
+/This Afternoon through Monday/
+
+Widespread moderate to heavy rain moved through Central Texas this 
+morning with the heaviest precipitation associated with the earlier 
+complex now well to the south of the forecast area. Light to 
+moderate rain is still ongoing behind the main band farther east,
+while more isolated convection with pockets of heavy rainfall is 
+occurring across western Central Texas, which will continue into 
+the afternoon hours. To the north, a few echoes have already 
+appeared on radar along the Red River/NE of the Metroplex. 
+Isolated to scattered storm development is likely across much of 
+North Texas this afternoon, where the main upper level ascent 
+exists in an area of little to no capping. Within this, a pocket 
+of somewhat enhanced effective bulk shear has set up, with 20-35 
+kts in place per the latest mesoanalysis. This will support weakly
+organized cells developing this afternoon, with some likely 
+merging into clusters as the afternoon progresses and skies 
+continue clearing. These storms may briefly rotate, but anything 
+more supercellular is unlikely given weak instability and pockets 
+of dry air between 700-500 mb further reducing any already limited
+updraft strength. 
+
+Most of the storms will diminish in the evening hours, with only 
+isolated activity persisting (20-30%) overnight. This is mostly 
+favorable for eastern North Texas and for portions of Central 
+Texas. Given current trends, the Flood Watch will be allowed to 
+expire at 7 PM. Otherwise, patchy fog may develop tonight due to 
+light winds and recent rainfall saturating soils, particularly 
+where the heaviest rain fell today. A surface low has developed 
+across Southern Kansas with a near N-S oriented trough axis 
+expected to sharpen and become more defined through the overnight 
+hours, as embedded perturbations in the northwest flow aloft 
+provide ascent. Some of the recent CAM guidance depicts this ill-
+defined boundary essentially bisecting the forecast area by 
+tomorrow morning, with northerly winds behind it/to the west. This
+will focus isolated to scattered showers and storms along it 
+(20-40%), mostly likely in the vicinity of the I-35 corridor 
+during the morning. Isolated coverage (20%) will continue into the
+afternoon, gradually shifting south and east of the forecast area
+and exiting the forecast area by early evening. Skies are 
+expected to clear more in the afternoon, which will allow 
+temperatures to climb a few degrees warmer than today, topping off
+in the mid/upper 80s. 
+
+Gordon
+
+&&
+
+.LONG TERM... /Issued 128 PM CDT Sun Aug 31 2025/
+/Monday Night Onward/
+
+The mid/upper level shortwave will drop southeast through the 
+Missouri Valley and Ozarks Monday night into Tuesday, which will 
+send a cold front sagging through Oklahoma and into North and 
+Central Texas. A stray shower developing as the front moves 
+through can't be entirely ruled out for areas east of I-35 along 
+the Red River, but any chances of this remains low (10-20%). 
+Slightly cooler air will accompany the front, with persistent 
+northerly winds during the day Tuesday primarily ushering in 
+drier air to the region. Current PWAT over the area is greater 
+than the climatological 90th Percentile, with today's 12Z FWD 
+sounding measuring right at 2". Behind the front on Tuesday, the 
+drier air will will drop PWATs to 1-1.4" across the area, back 
+down to the climatological mean.
+
+Northwest flow aloft will prevail through the midweek with dry 
+conditions expected both Tuesday and Wednesday, along with highs 
+in the upper 80s/low 90s. Meanwhile, on Wednesday, a pronounced 
+upper level low will develop in the Ontario province and drop 
+southward into the Great Lakes region. This will set up more 
+amplified troughing over the Eastern U.S. late week, with another 
+cold front moving through the Plains , approaching Oklahoma 
+Wednesday night. Unfortunately, this front will become washed out 
+and will fail to provide any cooldown. It will however, bring
+slight rain chances back to western North TX (10-20%) as a 
+weakening complex associated with this may approach from Oklahoma.
+The remnant boundary will then likely lift back northward as a 
+warm front, with southwest winds ahead of yet another potential
+front aiding in compressional warming on Friday. This will result
+in the warmest day of the next week, with highs in the low to mid
+90s. Guidance is almost evenly split on the cold front for Friday
+night and Saturday, which is expected given it's Day 7. About 60%
+of ensemble guidance keeps the front entirely to the north or
+stalls it not far south of the Red River. Given the uncertainty,
+low PoPs are advertised Friday night into the weekend, with
+temperatures Saturday in the mid/upper 80s. In terms of any cool
+down, none of the guidance is impressive (or aggressively "Fall-
+like") by any means, with the Middle 50th of the LREF guidance 
+generally between 80-90 degrees for high temperatures, while the 
+NBM is a few degrees warmer in its distribution. 
+
+Gordon
+
+&&
+
+.AVIATION... /NEW/
+/00Z TAFs/
+
+VFR conditions with VCSH will continue to impact Metroplex 
+airports this evening, with HRRR suggesting showers in and around 
+D10 through 06Z or so. Overnight, some patchy fog will bring tempo
+MVFR visibility to a few airports, but it's not expected to be
+widespread or dense. Additional SHRA are anticipated after 15Z on
+Monday at Metroplex airports, with a low chance for VCTS. For 
+KACT, VFR conditions are expected this evening but fog will bring 
+IFR/LIFR conditions overnight in the 10-14Z timeframe. Conditions
+look to improve back to VFR after 14Z with more VCSH anticipated.
+At all airports, light southeast winds this evening will back to 
+northerly with a weak fropa on Monday morning.
+
+
+Shamburger
+
+&&
+
+.SPOTTER INFORMATION STATEMENT...
+Spotter activation is not expected at this time.
+
+&&
+
+.PRELIMINARY POINT TEMPS/POPS...
+Dallas-Ft. Worth    73  88  71  89  68 /  30  40   5  10   0 
+Waco                72  86  69  92  67 /  30  40   5   5   0 
+Paris               70  86  66  86  64 /  30  20  20  20   0 
+Denton              70  88  67  88  64 /  30  30   5  10   0 
+McKinney            71  87  68  88  64 /  30  30   5  10   0 
+Dallas              73  88  72  90  69 /  30  40   5  10   0 
+Terrell             70  86  69  89  65 /  30  30   5  10   0 
+Corsicana           72  88  70  92  69 /  30  30   5  10   0 
+Temple              70  87  69  93  68 /  30  40   5   5   0 
+Mineral Wells       69  88  67  90  64 /  30  20   5   5   0 
+
+&&
+
+.FWD WATCHES/WARNINGS/ADVISORIES...
+None.
+&&
+
+$$
+
+
+
+648 
+FXUS64 KFWD 311828
+AFDFWD
+
+Area Forecast Discussion
+National Weather Service Fort Worth TX
+128 PM CDT Sun Aug 31 2025
+
+...New Short Term, Long Term, Aviation... 
+
+.KEY MESSAGES...
+
+- Scattered thunderstorms will continue to impact North and
+  Central Texas through tomorrow. 
+ 
+- A Flood Watch is in effect for most of Central Texas today where
+  additional rain totals of 1 of 3 inches are possible.
+ 
+- Following cooler temperatures over the weekend, highs will 
+  return to the 80s and lower 90s next week.
+ 
+&&
+
+.SHORT TERM... /NEW/
+/This Afternoon through Monday/
+
+Widespread moderate to heavy rain moved through Central Texas this 
+morning with the heaviest precipitation associated with the earlier 
+complex now well to the south of the forecast area. Light to 
+moderate rain is still ongoing behind the main band farther east,
+while more isolated convection with pockets of heavy rainfall is 
+occurring across western Central Texas, which will continue into 
+the afternoon hours. To the north, a few echoes have already 
+appeared on radar along the Red River/NE of the Metroplex. 
+Isolated to scattered storm development is likely across much of 
+North Texas this afternoon, where the main upper level ascent 
+exists in an area of little to no capping. Within this, a pocket 
+of somewhat enhanced effective bulk shear has set up, with 20-35 
+kts in place per the latest mesoanalysis. This will support weakly
+organized cells developing this afternoon, with some likely 
+merging into clusters as the afternoon progresses and skies 
+continue clearing. These storms may briefly rotate, but anything 
+more supercellular is unlikely given weak instability and pockets 
+of dry air between 700-500 mb further reducing any already limited
+updraft strength. 
+
+Most of the storms will diminish in the evening hours, with only 
+isolated activity persisting (20-30%) overnight. This is mostly 
+favorable for eastern North Texas and for portions of Central 
+Texas. Given current trends, the Flood Watch will be allowed to 
+expire at 7 PM. Otherwise, patchy fog may develop tonight due to 
+light winds and recent rainfall saturating soils, particularly 
+where the heaviest rain fell today. A surface low has developed 
+across Southern Kansas with a near N-S oriented trough axis 
+expected to sharpen and become more defined through the overnight 
+hours, as embedded perturbations in the northwest flow aloft 
+provide ascent. Some of the recent CAM guidance depicts this ill-
+defined boundary essentially bisecting the forecast area by 
+tomorrow morning, with northerly winds behind it/to the west. This
+will focus isolated to scattered showers and storms along it 
+(20-40%), mostly likely in the vicinity of the I-35 corridor 
+during the morning. Isolated coverage (20%) will continue into the
+afternoon, gradually shifting south and east of the forecast area
+and exiting the forecast area by early evening. Skies are 
+expected to clear more in the afternoon, which will allow 
+temperatures to climb a few degrees warmer than today, topping off
+in the mid/upper 80s. 
+
+Gordon
+
+&&
+
+.LONG TERM... /NEW/
+/Monday Night Onward/
+
+The mid/upper level shortwave will drop southeast through the 
+Missouri Valley and Ozarks Monday night into Tuesday, which will 
+send a cold front sagging through Oklahoma and into North and 
+Central Texas. A stray shower developing as the front moves 
+through can't be entirely ruled out for areas east of I-35 along 
+the Red River, but any chances of this remains low (10-20%). 
+Slightly cooler air will accompany the front, with persistent 
+northerly winds during the day Tuesday primarily ushering in 
+drier air to the region. Current PWAT over the area is greater 
+than the climatological 90th Percentile, with today's 12Z FWD 
+sounding measuring right at 2". Behind the front on Tuesday, the 
+drier air will will drop PWATs to 1-1.4" across the area, back 
+down to the climatological mean.
+
+Northwest flow aloft will prevail through the midweek with dry 
+conditions expected both Tuesday and Wednesday, along with highs 
+in the upper 80s/low 90s. Meanwhile, on Wednesday, a pronounced 
+upper level low will develop in the Ontario province and drop 
+southward into the Great Lakes region. This will set up more 
+amplified troughing over the Eastern U.S. late week, with another 
+cold front moving through the Plains , approaching Oklahoma 
+Wednesday night. Unfortunately, this front will become washed out 
+and will fail to provide any cooldown. It will however, bring
+slight rain chances back to western North TX (10-20%) as a 
+weakening complex associated with this may approach from Oklahoma.
+The remnant boundary will then likely lift back northward as a 
+warm front, with southwest winds ahead of yet another potential
+front aiding in compressional warming on Friday. This will result
+in the warmest day of the next week, with highs in the low to mid
+90s. Guidance is almost evenly split on the cold front for Friday
+night and Saturday, which is expected given it's Day 7. About 60%
+of ensemble guidance keeps the front entirely to the north or
+stalls it not far south of the Red River. Given the uncertainty,
+low PoPs are advertised Friday night into the weekend, with
+temperatures Saturday in the mid/upper 80s. In terms of any cool
+down, none of the guidance is impressive (or aggressively "Fall-
+like") by any means, with the Middle 50th of the LREF guidance 
+generally between 80-90 degrees for high temperatures, while the 
+NBM is a few degrees warmer in its distribution. 
+
+Gordon
+
+&&
+
+.AVIATION... /NEW/
+/18Z TAFs/
+
+Conditions have improved across much of the area with a return to
+VFR in the last 1-2 hours. VCTS has been introduced for the D10 
+sites from 19-22Z to account for isolated showers/storm 
+developing across North Texas, with VCSH continuing at ACT 
+through 23Z. For the evening and overnight period, VFR will 
+prevail with scattered cloud cover before another round of showers
+and potentially a few storms develop in the vicinity of the I-35 
+corridor. A wind shift to the N-NE will accompany this and 
+continue for much of the day Monday, with winds generally between 
+4-6 kts. Coverage of any storms should remain low, so have opted 
+to maintain VCSH at all sites during the morning. Spotty MVFR 
+ceilings will impact the region as well, but there is greater 
+uncertainty in the extent of this developing, so a TEMPO group has
+been included for the early morning hours with refinements needed
+in future issuances. Otherwise, for KACT's TEMPO, MVFR 
+visibilities have been included as well to account for the low 
+potential of fog/mist development. 
+
+Gordon
+
+&&
+
+.SPOTTER INFORMATION STATEMENT...
+Spotter activation is not expected at this time.
+
+&&
+
+.PRELIMINARY POINT TEMPS/POPS...
+Dallas-Ft. Worth    85  73  88  71  89 /  50  20  40   5  10 
+Waco                82  72  86  69  92 /  80  30  40   5   5 
+Paris               85  70  86  66  86 /  40  20  20  20  20 
+Denton              85  71  88  67  88 /  40  20  30   5  10 
+McKinney            84  71  87  68  88 /  50  20  30   5  10 
+Dallas              85  74  88  72  90 /  50  20  40   5  10 
+Terrell             83  71  86  69  89 /  60  20  30   5  10 
+Corsicana           84  73  88  70  92 /  80  20  30   5  10 
+Temple              82  71  87  69  93 /  70  30  40   5   5 
+Mineral Wells       85  70  88  67  90 /  60  20  20   5   5 
+
+&&
+
+.FWD WATCHES/WARNINGS/ADVISORIES...
+Flood Watch until 7 PM CDT this evening for TXZ135-142>148-
+156>162-174-175.
+
+&&
+
+$$
+
+

@@ -1,0 +1,51 @@
+# prime-rl LoRA RL for K2-Horizon-7B (+SFT). Needs 2 GPUs (vLLM + trainer each hold the ~16.8 GB bf16 model);
+# does NOT fit on one 32 GB GPU. On one GPU use scripts/grpo_lora_hf.py instead (single weight copy).
+max_steps = 100
+seq_len = 4096
+
+[model]
+name = "/hackathon/outputs/ercot-sft-k2-lora/merged"
+
+[tokenizer]
+trust_remote_code = true
+
+[orchestrator.model]
+trust_remote_code = true
+
+[trainer.model]
+trust_remote_code = true
+impl = "hf"
+attn = "flash_attention_2"
+optim_cpu_offload = false
+optimization_dtype = "bfloat16"
+reduce_dtype = "bfloat16"
+
+[trainer.model.lora]
+rank = 16
+alpha = 32.0
+
+[orchestrator]
+batch_size = 32
+group_size = 8
+
+[orchestrator.train.sampling]
+max_completion_tokens = 512
+temperature = 1.0
+
+[[orchestrator.train.source]]
+name = "ercot-sql-k2"
+env.taskset.id = "ercot-sql"
+env.taskset.split = "../ercot-bench/grid-analyst/data/tasks/rl_train_k2.jsonl"
+env.agent.harness.id = "null"
+env.agent.runtime.type = "subprocess"
+
+[orchestrator.renderer]
+name = "default"
+reasoning_effort = "low"
+
+[trainer.optim]
+lr = 1e-5
+
+[inference]
+[inference.vllm]
+trust_remote_code = true

@@ -1,10 +1,5 @@
-data/
-results/
+# compatibility symlink: data -> grid-analyst/data (old path used by local scripts)
+/data
 .venv/
 __pycache__/
-*.pyc
 .env
-outputs/
-.pytest_cache/
-results_*.log
-*.log
