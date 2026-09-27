@@ -228,27 +228,48 @@ Now:
 - RL uses LoRA with the optimizer on the GPU (`rl_lora_1gpu.toml`). In the verified run host RAM never dropped below
   27 GB available and VRAM peaked at 21.8 / 32 GB (vLLM 35% + trainer).
 
-## Results (prototype, RTX 5090 + Claude Code CLI)
+## Results (RTX 5090 + Claude Code CLI)
 
 Same stratified test subsets for every model (test_in_template: 70 tasks, 2/template; held-out templates: 27 tasks,
-3/template); pass@1 = mean accuracy over k samples (k=3 Sonnet/Qwen3-8B, k=4 Qwen3-1.7B). Open models run
-with thinking disabled.
+never seen in training). pass@1 = mean accuracy over k samples (k=3 Claude/Qwen3-8B base, k=4 others);
+"consistent" = correct on all k samples. Open models: Qwen3 with thinking off, K2 with `reasoning_effort=low`.
+All fine-tunes use the same 802 correct Sonnet solutions (SFT only, no RL yet).
 
-| model | test_in_template | test_heldout_templates |
-|---|---|---|
-| Claude Sonnet (claude-cli) | 98.1% | 87.7% |
-| Qwen3-8B base | 52.9% | 37.0% |
-| Qwen3-1.7B base | 16.8% | 13.9% |
-| **Qwen3-1.7B + SFT on 802 Sonnet solutions** | **83.2%** | **53.7%** |
+| model | test_in_template | held-out templates | consistent (in-template) | mean output tokens |
+|---|---|---|---|---|
+| Claude Sonnet (claude-cli) | 98.1% | 87.7% | 97.1% | 218 |
+| Claude Haiku 4.5 (claude-cli) | 97.6% | 85.2% | 92.9% | 2,949 (reasoning) |
+| **Qwen3-8B + SFT (LoRA)** | **95.0%** | 58.3% | 88.6% | 109 |
+| **K2-Horizon-7B + SFT (LoRA)** | 91.8% | **63.0%** | 82.9% | 101 |
+| Qwen3-1.7B + SFT (full FT) | 83.2% | 53.7% | 74.3% | 111 |
+| K2-Horizon-7B base | 66.8% | 45.4% | 31.4% | 407 (reasoning) |
+| Qwen3-8B base | 52.9% | 37.0% | 40.0% | 245 |
+| Qwen3-1.7B base | 16.8% | 13.9% | 10.0% | 282 |
 
-- SFT: 80 steps, loss 1.15 -> 0.038, ~18 min. The SFT'd 1.7B beats the base 8B on both splits; the remaining gap
-  to Sonnet is largest on held-out templates (advanced/battery families), i.e. generalization, not format.
-- RL smoke (LoRA GRPO, 15 steps, batch 16 x group 8 from the SFT checkpoint): per-step mean reward 0.38-0.88,
-  non-constant, 0 errors -- the environment and reward plumbing work inside prime-rl.
+Training on one RTX 5090 (all under the memory safeguards):
+
+| run | recipe | time | peak VRAM |
+|---|---|---|---|
+| Qwen3-1.7B SFT | prime-rl, full FT, 80 steps | 18 min | 29.2 GB |
+| Qwen3-8B SFT | prime-rl, LoRA r32, bf16 params, 40 steps (~3.2 epochs) | 30 min | 20.0 GB |
+| K2-Horizon-7B SFT | `scripts/sft_lora_hf.py`, LoRA r32, 2 epochs | 14 min | 20.1 GB |
+| Qwen3-1.7B RL smoke | prime-rl GRPO, LoRA, 15 steps | 2.5 min | 21.8 GB (incl. vLLM) |
+
+- Fine-tuned 7-8B models get within ~3-6 points of Claude on in-template questions while answering in ~100 tokens
+  (single-request latency ~1-2 s on the 5090 vs ~7-25 s for Haiku, which reasons for ~3k tokens), self-hosted.
+- Generalization to unseen question types is the open gap (58-63% vs Claude's 85-88%): the next lever is more
+  template diversity and RL, not more epochs.
+- The stronger base (K2) generalizes better after SFT (63.0% held-out) even though Qwen3-8B wins in-template.
+- RL smoke (LoRA GRPO from the 1.7B SFT checkpoint): per-step reward 0.38-0.88, non-constant, 0 errors.
 - verifiers `eval` on `ercot-sql` vs our harness: 64/64 rewards identical.
-- **Flag (per spec):** Sonnet is above the ~85% threshold on both test splits, even after adding the `advanced`
-  family (Sonnet 90% there). The templates are still too easy to measure frontier progress; they are hard enough to
-  show a large small-model gain. Making templates harder is the top next step.
+- **Flag (per spec):** Claude is above the ~85% threshold on both splits; templates need to get harder to track
+  frontier progress.
+
+K2-Horizon-7B notes: served by vLLM's Transformers backend (`--vllm.trust-remote-code True`); prime-rl SFT needs a
+typed renderer K2 doesn't have, so it's trained with `scripts/sft_lora_hf.py` (LoRA without peft; loss only on
+assistant tokens; LM head applied only to answer positions, which cut peak VRAM from >32 GB to 20 GB given K2's
+250k vocab). Its chat template requires a thinking field, so `data/sft_k2` sets `think_faster=""` and the tuned
+model learns to answer immediately under `reasoning_effort=low`.
 
 ## Layout
 

@@ -25,6 +25,9 @@ from ercot_bench.tasks.schema import Task
 REWARDS = {"correct": 1.0, "wrong_answer": 0.0, "sql_error": 0.0, "format_error": -0.2}
 
 _THINK_RE = re.compile(r"<think>.*?</think>", re.DOTALL | re.IGNORECASE)
+# Closing tag of a reasoning block whose opening tag was part of the prompt (e.g. K2-Horizon's generation prompt
+# ends with "<ifm|think_faster>", so only "</ifm|think_faster>" appears in the completion).
+_THINK_CLOSE_RE = re.compile(r"</(?:ifm\|)?think[a-z_]*>", re.IGNORECASE)
 _SQL_BLOCK_RE = re.compile(r"```[ \t]*sql[ \t]*\n(.*?)```", re.DOTALL | re.IGNORECASE)
 
 
@@ -40,7 +43,11 @@ class ScoreResult(BaseModel):
 
 def extract_sql(completion: str) -> str | None:
     """Last ```sql fenced block, ignoring any <think>...</think> reasoning."""
-    text = _THINK_RE.sub("", completion or "")
+    text = completion or ""
+    closes = list(_THINK_CLOSE_RE.finditer(text))
+    if closes:  # everything up to the last reasoning close tag is reasoning
+        text = text[closes[-1].end():]
+    text = _THINK_RE.sub("", text)
     # an unterminated <think> means the model never finished reasoning
     if "<think>" in text.lower():
         text = text[text.lower().rfind("</think>") + 8:] if "</think>" in text.lower() else ""

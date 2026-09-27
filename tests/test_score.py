@@ -15,6 +15,10 @@ def test_extract_sql_last_block_and_think():
     assert extract_sql("no code") is None
     assert extract_sql("<think>never closed ```sql\nSELECT 1\n```") is None
     assert extract_sql("```\nSELECT 1\n```") is None  # untagged block not accepted
+    # K2-Horizon style: reasoning opened by the prompt, closed in the completion (drafts inside are ignored)
+    k2 = "draft:\n```sql\nSELECT 0\n```\n</ifm|think_faster>Answer:\n```sql\nSELECT 3\n```"
+    assert extract_sql(k2) == "SELECT 3"
+    assert extract_sql("reasoning...</ifm|think>no sql here") is None
 
 
 def test_compare_number_tolerance():
