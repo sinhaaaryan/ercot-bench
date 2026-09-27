@@ -152,7 +152,8 @@ def eval_cmd(
     max_tokens: int = typer.Option(4096, help="openai-compat/anthropic-api only"),
     use_n: bool = typer.Option(False, help="openai-compat: request n samples in one call (vLLM)"),
     effort: Optional[str] = typer.Option(None, help="claude-cli: --effort level"),
-    no_thinking: bool = typer.Option(False, help="openai-compat: disable Qwen3-style thinking via chat_template_kwargs"),
+    no_thinking: bool = typer.Option(False, help="Disable thinking: Qwen3 chat_template_kwargs (openai-compat) or "
+                                                 "alwaysThinkingEnabled=false (claude-cli)"),
     template_kwargs: Optional[str] = typer.Option(None, help='openai-compat: extra chat_template_kwargs as JSON, e.g. \'{"reasoning_effort": "low"}\''),
     out: Optional[Path] = typer.Option(None, help="Output JSONL (default results/<split>__<backend>__<model>.jsonl)"),
     config: Optional[Path] = ConfigOpt,
@@ -171,6 +172,8 @@ def eval_cmd(
     ctk = {**({"enable_thinking": False} if no_thinking else {}), **(json.loads(template_kwargs) if template_kwargs else {})}
     kw = {"base_url": base_url, "temperature": temperature, "max_tokens": max_tokens, "use_n": use_n, "effort": effort,
           "extra_body": {"chat_template_kwargs": ctk} if ctk else None}
+    if backend == "claude-cli" and no_thinking:
+        kw["thinking"] = False
     client = make_client(backend, model, **{k_: v for k_, v in kw.items() if v is not None})
     split_name = Path(split).stem
     out = out or default_output_path(REPO_ROOT / "results", split_name, backend, model)

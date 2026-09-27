@@ -230,6 +230,13 @@ Now:
 
 ## Results (RTX 5090 + Claude Code CLI)
 
+![ERCOT-Bench results](docs/benchmark.png)
+
+Regenerate: `uv run ercot-bench report && uv run --with matplotlib python scripts/plot_results.py`.
+Haiku 4.5 is the smallest Claude model still served (Claude 3/3.5 Haiku, Sonnet 3.7 and Sonnet 4 are retired);
+`--no-thinking` on the claude-cli backend (`alwaysThinkingEnabled: false`) gives the apples-to-apples baseline, since
+our fine-tuned models also answer without reasoning.
+
 Same stratified test subsets for every model (test_in_template: 70 tasks, 2/template; held-out templates: 27 tasks,
 never seen in training). pass@1 = mean accuracy over k samples (k=3 Claude/Qwen3-8B base, k=4 others);
 "consistent" = correct on all k samples. Open models: Qwen3 with thinking off, K2 with `reasoning_effort=low`.
@@ -239,6 +246,7 @@ All fine-tunes use the same 802 correct Sonnet solutions (SFT only, no RL yet).
 |---|---|---|---|---|
 | Claude Sonnet (claude-cli) | 98.1% | 87.7% | 97.1% | 218 |
 | Claude Haiku 4.5 (claude-cli) | 97.6% | 85.2% | 92.9% | 2,949 (reasoning) |
+| Claude Haiku 4.5, thinking off (claude-cli) | 90.0% | 59.3% | 81.4% | 314 |
 | **Qwen3-8B + SFT (LoRA)** | **95.0%** | 58.3% | 88.6% | 109 |
 | **K2-Horizon-7B + SFT (LoRA)** | 91.8% | **63.0%** | 82.9% | 101 |
 | Qwen3-1.7B + SFT (full FT) | 83.2% | 53.7% | 74.3% | 111 |
@@ -259,6 +267,8 @@ Training on one RTX 5090 (all under the memory safeguards):
   (single-request latency ~1-2 s on the 5090 vs ~7-25 s for Haiku, which reasons for ~3k tokens), self-hosted.
 - Generalization to unseen question types is the open gap (58-63% vs Claude's 85-88%): the next lever is more
   template diversity and RL, not more epochs.
+- **Fine-tuned K2-Horizon-7B beats Claude Haiku 4.5 (thinking off) on both splits (91.8% vs 90.0%, 63.0% vs 59.3%)**
+  with a third of the output; Qwen3-8B + SFT beats it in-template (95.0%) and ties held-out (58.3% vs 59.3%).
 - The stronger base (K2) generalizes better after SFT (63.0% held-out) even though Qwen3-8B wins in-template.
 - RL smoke (LoRA GRPO from the 1.7B SFT checkpoint): per-step reward 0.38-0.88, non-constant, 0 errors.
 - verifiers `eval` on `ercot-sql` vs our harness: 64/64 rewards identical.

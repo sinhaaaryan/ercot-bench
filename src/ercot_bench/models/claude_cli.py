@@ -35,7 +35,8 @@ RATE_LIMIT_MARKERS = ("usage limit", "rate limit", "rate_limit", "limit reached"
                       "too many requests")
 
 
-def base_args(system_prompt: str, model: str, output_format: str = "json", effort: str | None = None) -> list[str]:
+def base_args(system_prompt: str, model: str, output_format: str = "json", effort: str | None = None,
+              thinking: bool = True) -> list[str]:
     exe = shutil.which("claude") or "claude"
     args = [exe, "-p", "--system-prompt", system_prompt, "--tools", "", "--max-turns", "1",
             "--strict-mcp-config", "--setting-sources", "", "--disable-slash-commands",
@@ -44,6 +45,8 @@ def base_args(system_prompt: str, model: str, output_format: str = "json", effor
         args.append("--verbose")
     if effort:
         args += ["--effort", effort]
+    if not thinking:  # verified: output_tokens_details.thinking_tokens == 0 with this setting
+        args += ["--settings", '{"alwaysThinkingEnabled": false}']
     return args
 
 
@@ -70,18 +73,21 @@ class ClaudeCLIClient(ModelClient):
     backend = "claude-cli"
 
     def __init__(self, model: str = "sonnet", timeout_s: float = 300, max_retries: int = 4,
-                 backoff_s: float = 30, effort: str | None = None, **_: Any):
+                 backoff_s: float = 30, effort: str | None = None, thinking: bool = True, **_: Any):
         self.model = model
         self.timeout_s = timeout_s
         self.max_retries = max_retries
         self.backoff_s = backoff_s
         self.effort = effort
+        self.thinking = thinking
 
     def describe(self) -> dict[str, Any]:
-        return {"backend": self.backend, "model": self.model, "temperature": "cli-default", "effort": self.effort}
+        model = self.model if self.thinking else f"{self.model} (no thinking)"
+        return {"backend": self.backend, "model": model, "temperature": "cli-default", "effort": self.effort,
+                "thinking": self.thinking}
 
     async def _one(self, system_prompt: str, user_prompt: str) -> Completion:
-        args = base_args(system_prompt, self.model, "json", self.effort)
+        args = base_args(system_prompt, self.model, "json", self.effort, self.thinking)
         for attempt in range(self.max_retries + 1):
             t0 = time.time()
             rc, out, err = await _run(args, user_prompt, self.timeout_s)
